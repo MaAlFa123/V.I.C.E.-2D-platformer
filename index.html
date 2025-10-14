@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V.I.C.E. 2D PLATFORMER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Courier Prime', monospace;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #22d3ee, #0ea5e9, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn {
+            @apply w-64 text-center bg-gray-800 border-2 border-cyan-400/50 hover:bg-cyan-400 hover:text-gray-900 text-cyan-400 font-bold text-2xl py-4 px-8 rounded-lg shadow-lg shadow-cyan-500/10 transition-all duration-300;
+        }
+        .btn-back {
+             @apply bg-red-800/50 border-red-500/50 hover:bg-red-500 hover:text-white text-red-400;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+    <div class="text-center p-8 max-w-2xl mx-auto w-full">
+        <h1 class="text-8xl font-bold mb-12 gradient-text tracking-widest animate-pulse">
+            V.I.C.E.
+            <span class="block text-3xl text-gray-300 mt-2">2D PLATFORMER</span>
+        </h1>
+
+        <div id="main-menu" class="flex flex-col items-center gap-6">
+            <button id="play-btn" class="btn">Play</button>
+            <a href="costum.html" class="btn">Create</a>
+        </div>
+
+        <div id="play-submenu" class="hidden flex-col items-center gap-6 mt-6">
+            <button class="btn">Campaign</button>
+            <button class="btn">User Levels</button>
+            <button id="back-btn" class="btn btn-back mt-4">Back</button>
+        </div>
+
+    </div>
+    <footer class="absolute bottom-4 text-gray-500">
+        Made by MaAlFa123
+    </footer>
+
+    <script>
+        const playBtn = document.getElementById('play-btn');
+        const backBtn = document.getElementById('back-btn');
+        const mainMenu = document.getElementById('main-menu');
+        const playSubmenu = document.getElementById('play-submenu');
+
+        playBtn.addEventListener('click', () => {
+            mainMenu.classList.add('hidden');
+            mainMenu.classList.remove('flex');
+            playSubmenu.classList.remove('hidden');
+            playSubmenu.classList.add('flex');
+        });
+
+        backBtn.addEventListener('click', () => {
+            playSubmenu.classList.add('hidden');
+            playSubmenu.classList.remove('flex');
+            mainMenu.classList.remove('hidden');
+            mainMenu.classList.add('flex');
+        });
+    </script>
+</body>
+</html>
+
