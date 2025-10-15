@@ -61,11 +61,22 @@
         #game-container {
             position: relative;
         }
+        #background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            display: none !important; /* Make sure it's always hidden */
+        }
         #gameCanvas {
             border: 2px solid #555;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             cursor: crosshair;
-            /* background-color: #000; <- Removed to be controlled by JS */
+            background-size: cover;
+            background-position: center;
         }
         #game-timer-display {
             position: absolute;
@@ -191,6 +202,30 @@
             align-items: center;
             width: 50%;
         }
+        .background-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+            width: 50%;
+            justify-content: center;
+        }
+        .background-controls button {
+            padding: 2px 5px;
+            font-size: 0.8em;
+            flex-basis: 45%;
+         }
+        #timeline-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        #timeline-header button {
+            font-size: 0.8em;
+            padding: 2px 5px;
+        }
         #timeline-container {
             margin-top: 10px;
             width: 800px;
@@ -246,6 +281,7 @@
     </div>
     <div id="editor-wrapper">
         <div id="game-container">
+            <video id="background-video" loop muted playsinline></video>
             <canvas id="gameCanvas" width="800" height="600"></canvas>
             <div id="game-timer-display">0.00</div>
             <div id="controls-display"></div>
@@ -255,7 +291,7 @@
             <div id="object-settings-content">
                 <h3>Object Settings</h3>
                 <div id="general-settings">
-                    <label for="color-picker">Color:</label>
+                    <label for="color-picker">Block Color:</label>
                     <input type="color" id="color-picker">
                     <button id="rotate-btn">Rotate</button>
                     <div class="settings-row">
@@ -263,11 +299,26 @@
                          <label for="transparent-checkbox">Invisible in Play Mode</label>
                     </div>
                 </div>
-                <div id="text-settings" class="settings-section" style="display: none;">
+                <div id="text-block-settings" class="settings-section" style="display: none;">
+                    <h4>Text Properties</h4>
                     <label for="text-content-input">Text:</label>
                     <input type="text" id="text-content-input">
+                    <label for="font-family-select">Font:</label>
+                    <select id="font-family-select">
+                        <option value="'Courier New', Courier, monospace">Courier New</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                    </select>
                     <label for="font-size-input">Font Size:</label>
-                    <input type="number" id="font-size-input" min="8" max="100">
+                    <input type="number" id="font-size-input" min="8" max="200">
+                    <label for="text-color-picker">Text Color:</label>
+                    <input type="color" id="text-color-picker" value="#FFFFFF">
+                    <label for="text-glow-color-picker">Glow Color:</label>
+                    <input type="color" id="text-glow-color-picker" value="#000000">
+                     <label for="text-glow-size-input">Glow Size:</label>
+                    <input type="number" id="text-glow-size-input" min="0" max="50" value="0">
                 </div>
                 <div id="button-laser-settings" class="settings-section" style="display: none;">
                     <label for="laser-direction-select">Set Laser Direction:</label>
@@ -286,14 +337,19 @@
         </div>
         <div id="timeline-settings-panel">
             <button class="close-btn" id="close-timeline-panel">X</button>
-            <h3>Text Event</h3>
             <div id="event-text-settings">
+                <h3>Text Event</h3>
                 <label for="event-text-content">Text:</label>
                 <input type="text" id="event-text-content">
                 <label for="event-text-size">Size:</label>
                 <input type="number" id="event-text-size" value="24">
                  <label for="event-text-color">Color:</label>
                 <input type="color" id="event-text-color" value="#FFFFFF">
+            </div>
+             <div id="event-color-settings" style="display: none;">
+                <h3>Background Color Event</h3>
+                <label for="event-bg-color">Target Color:</label>
+                <input type="color" id="event-bg-color" value="#000000">
             </div>
         </div>
     </div>
@@ -306,7 +362,7 @@
             <button class="tool-btn" data-type="button">Button</button>
             <button class="tool-btn" data-type="decay">Decay Block</button>
             <button class="tool-btn" data-type="delay">Delay Block</button>
-             <button class="tool-btn" data-type="text">Text</button>
+             <button class="tool-btn" data-type="text_block">Text Block</button>
              <button class="tool-btn" data-type="music">Music</button>
             <button class="tool-btn" data-type="spawn">Spawn</button>
             <button class="tool-btn" data-type="laser_source">Laser</button>
@@ -317,6 +373,10 @@
              <div class="settings-slider-row">
                 <label for="laser-speed-slider">Laser Speed:</label>
                 <input type="range" id="laser-speed-slider" min="0.5" max="10" step="0.1" value="1.5">
+            </div>
+             <div class="settings-slider-row">
+                <label for="platform-speed-slider">Platform Speed:</label>
+                <input type="range" id="platform-speed-slider" min="0.5" max="10" step="0.1" value="2">
             </div>
              <div class="settings-slider-row">
                 <label for="player-speed-slider">Player Speed:</label>
@@ -331,8 +391,15 @@
                 <input type="range" id="player-jump-slider" min="5" max="25" step="0.5" value="13">
             </div>
              <div class="settings-slider-row">
-                <label for="background-color-picker">Background:</label>
+                <label for="background-color-picker">BG Color:</label>
                 <input type="color" id="background-color-picker" value="#000000">
+            </div>
+            <div class="background-controls">
+                <button id="set-background-image-btn">Set BG Image</button>
+                <input type="file" id="background-image-input" accept="image/*" style="display: none;">
+                <button id="set-background-video-btn">Set BG Video</button>
+                <input type="file" id="background-video-input" accept="video/*" style="display: none;">
+                <button id="clear-background-btn">Clear Background</button>
             </div>
             <div class="settings-slider-row">
                 <label for="hook-enabled-checkbox">Grappling Hook:</label>
@@ -340,7 +407,11 @@
             </div>
         </div>
         <div id="timeline-container">
-            <label>Text Event Timeline (Max 300s) - Click to add, Drag to move/resize, Right-click to delete</label>
+            <div id="timeline-header">
+                <label>Timeline:</label>
+                <button id="add-text-event-btn">Add Text Event</button>
+                <button id="add-color-event-btn">Add Color Event</button>
+            </div>
             <canvas id="timeline-canvas" width="800" height="60"></canvas>
         </div>
         <div id="file-controls">
@@ -353,41 +424,71 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const backgroundVideo = document.getElementById('background-video');
         const gameTimerDisplay = document.getElementById('game-timer-display');
         const controlsDisplay = document.getElementById('controls-display');
         const timelineCanvas = document.getElementById('timeline-canvas');
         const timelineCtx = timelineCanvas.getContext('2d');
         const controlsText = document.getElementById('controls');
         const toolButtons = document.querySelectorAll('.tool-btn');
+        
+        // Settings Panels
         const settingsPanel = document.getElementById('settings-panel');
         const objectSettingsContent = document.getElementById('object-settings-content');
         const colorPicker = document.getElementById('color-picker');
         const rotateBtn = document.getElementById('rotate-btn');
         const transparentCheckbox = document.getElementById('transparent-checkbox');
-        const textSettingsDiv = document.getElementById('text-settings');
+        
+        // Text Block Settings
+        const textBlockSettingsDiv = document.getElementById('text-block-settings');
         const textContentInput = document.getElementById('text-content-input');
         const fontSizeInput = document.getElementById('font-size-input');
+        const fontFamilySelect = document.getElementById('font-family-select');
+        const textColorPicker = document.getElementById('text-color-picker');
+        const textGlowColorPicker = document.getElementById('text-glow-color-picker');
+        const textGlowSizeInput = document.getElementById('text-glow-size-input');
+
+        // Other Object Settings
         const buttonLaserSettingsDiv = document.getElementById('button-laser-settings');
         const laserDirectionSelect = document.getElementById('laser-direction-select');
         const musicBlockSettingsDiv = document.getElementById('music-block-settings');
         const musicBlockFileInput = document.getElementById('music-block-file');
+        
+        // Game Settings
         const laserSpeedSlider = document.getElementById('laser-speed-slider');
+        const platformSpeedSlider = document.getElementById('platform-speed-slider');
         const playerSpeedSlider = document.getElementById('player-speed-slider');
         const playerAccelSlider = document.getElementById('player-accel-slider');
         const playerJumpSlider = document.getElementById('player-jump-slider');
-        const backgroundColorPicker = document.getElementById('background-color-picker');
         const hookEnabledCheckbox = document.getElementById('hook-enabled-checkbox');
+        
+        // Background Settings
+        const backgroundColorPicker = document.getElementById('background-color-picker');
+        const setBackgroundImageBtn = document.getElementById('set-background-image-btn');
+        const backgroundImageInput = document.getElementById('background-image-input');
+        const setBackgroundVideoBtn = document.getElementById('set-background-video-btn');
+        const backgroundVideoInput = document.getElementById('background-video-input');
+        const clearBackgroundBtn = document.getElementById('clear-background-btn');
+        
+        // Timeline
         const timelineSettingsPanel = document.getElementById('timeline-settings-panel');
+        const eventTextSettingsDiv = document.getElementById('event-text-settings');
         const eventTextContentInput = document.getElementById('event-text-content');
         const eventTextSizeInput = document.getElementById('event-text-size');
         const eventTextColorInput = document.getElementById('event-text-color');
+        const eventColorSettingsDiv = document.getElementById('event-color-settings');
+        const eventBgColorInput = document.getElementById('event-bg-color');
+        const addTextEventBtn = document.getElementById('add-text-event-btn');
+        const addColorEventBtn = document.getElementById('add-color-event-btn');
         const closeSettingsPanelBtn = document.getElementById('close-settings-panel');
         const closeTimelinePanelBtn = document.getElementById('close-timeline-panel');
+        
+        // File I/O
         const saveButton = document.getElementById('saveButton');
         const loadButton = document.getElementById('loadButton');
         const importFileInput = document.getElementById('import-file-input');
         
-        // Main Menu elements
+        // Main Menu
         const mainMenu = document.getElementById('main-menu');
         const mainMenuButtons = document.getElementById('main-menu-buttons');
         const playSubMenu = document.getElementById('play-submenu');
@@ -408,15 +509,17 @@
         let mouseX = 0, mouseY = 0;
         let currentBlockType = 'select';
         let linkingState = { isLinking: false, sourceButtonId: null };
-        let movePathState = { isSetting: false, sourceObjectId: null };
+        let pathCreationState = { isCreating: false, sourceObjectId: null };
         let isSelectionRotated = false;
         let selectedObjectId = null;
         let gameWon = false;
         let gameTime = 0;
         
         let activeAudio = {};
+        let levelBackgroundImage = null;
 
         let selectedTimelineEventId = null;
+        let currentTimelineEventType = 'text';
         let timelineDragState = { isDragging: false, isResizing: null, targetId: null, offset: 0 };
         
         const worldWidth = 4000;
@@ -445,12 +548,13 @@
                 levelObjects = previousState.objects;
                 levelSettings = previousState.settings;
                 laserSpeedSlider.value = levelSettings.laserSpeed;
+                platformSpeedSlider.value = levelSettings.platformSpeed;
                 playerSpeedSlider.value = levelSettings.playerMaxSpeed;
                 playerAccelSlider.value = levelSettings.playerAcceleration;
                 playerJumpSlider.value = levelSettings.playerJumpPower;
-                canvas.style.backgroundColor = levelSettings.backgroundColor || '#000000';
                 backgroundColorPicker.value = levelSettings.backgroundColor || '#000000';
                 hookEnabledCheckbox.checked = levelSettings.hookEnabled || false;
+                loadBackgroundMedia();
                 applySettingsToPlayer();
                 drawTimeline();
             }
@@ -475,11 +579,14 @@
         
         let levelSettings = {
             laserSpeed: 1.5,
+            platformSpeed: 2,
             playerMaxSpeed: 5,
             playerAcceleration: 0.4,
             playerJumpPower: 13,
             timelineEvents: [],
             backgroundColor: '#000000',
+            backgroundImageSrc: null,
+            backgroundVideoSrc: null,
             hookEnabled: false,
         };
         
@@ -491,7 +598,8 @@
             startX: 0, startY: 0,
             ropeLength: 0,
             maxLength: 500,
-            speed: 30
+            speed: 30,
+            attachedObjectId: null,
         };
 
         const camera = { x: 0, y: 0 };
@@ -553,9 +661,9 @@
             const startPos = spawnPoint ? {x: spawnPoint.x, y: spawnPoint.y} : playerStart;
             Object.assign(player, { x: startPos.x, y: startPos.y, velocityX: 0, velocityY: 0, jumpsMade: 0, isDashing: false, isWallHolding: false, coyoteTimeCounter: 0, isCrouching: false, height: player.originalHeight });
 
-            camera.x = 0;
-            let targetCameraY = player.y - canvas.height / 2 + player.height / 2;
-            camera.y = targetCameraY;
+            // Instantly snap camera to the new player position
+            camera.x = player.x - canvas.width / 2 + player.width / 2;
+            camera.y = player.y - canvas.height / 2 + player.height / 2;
         }
 
         function canStandUp() {
@@ -630,7 +738,7 @@
         function updateSettingsPanel() {
             const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
             
-            textSettingsDiv.style.display = 'none';
+            textBlockSettingsDiv.style.display = 'none';
             buttonLaserSettingsDiv.style.display = 'none';
             musicBlockSettingsDiv.style.display = 'none';
             objectSettingsContent.style.display = 'none';
@@ -642,10 +750,14 @@
                     colorPicker.value = selectedObject.color || '#999999';
                     transparentCheckbox.checked = selectedObject.isSolid === false;
 
-                    if (selectedObject.type === 'text') {
-                        textSettingsDiv.style.display = 'block';
+                    if (selectedObject.type === 'text_block') {
+                        textBlockSettingsDiv.style.display = 'block';
                         textContentInput.value = selectedObject.content || '';
-                        fontSizeInput.value = selectedObject.fontSize || 16;
+                        fontSizeInput.value = selectedObject.fontSize || 32;
+                        fontFamilySelect.value = selectedObject.fontFamily || "'Courier New', Courier, monospace";
+                        textColorPicker.value = selectedObject.textColor || '#FFFFFF';
+                        textGlowColorPicker.value = selectedObject.glowColor || '#000000';
+                        textGlowSizeInput.value = selectedObject.glowSize || 0;
                     }
                      if (selectedObject.type === 'music') {
                         musicBlockSettingsDiv.style.display = 'block';
@@ -667,11 +779,20 @@
         
         function updateTimelineSettingsPanel() {
             const event = levelSettings.timelineEvents.find(ev => ev.id === selectedTimelineEventId);
+            eventTextSettingsDiv.style.display = 'none';
+            eventColorSettingsDiv.style.display = 'none';
+
             if(event && editorMode) {
                 timelineSettingsPanel.style.display = 'flex';
-                eventTextContentInput.value = event.text || '';
-                eventTextSizeInput.value = event.fontSize || 24;
-                eventTextColorInput.value = event.color || '#FFFFFF';
+                if (event.type === 'text') {
+                    eventTextSettingsDiv.style.display = 'block';
+                    eventTextContentInput.value = event.text || '';
+                    eventTextSizeInput.value = event.fontSize || 24;
+                    eventTextColorInput.value = event.color || '#FFFFFF';
+                } else if (event.type === 'background_color') {
+                    eventColorSettingsDiv.style.display = 'block';
+                    eventBgColorInput.value = event.color || '#000000';
+                }
             } else {
                 timelineSettingsPanel.style.display = 'none';
             }
@@ -681,19 +802,6 @@
             if (!editorMode) return;
             e.preventDefault();
             updateMousePos(e);
-            
-            if (currentBlockType === 'text') {
-                const text = prompt("Enter text:", "Hello World");
-                if (text) {
-                    levelObjects.push({
-                        id: Date.now() + Math.random(), type: 'text',
-                        x: mouseX, y: mouseY, content: text,
-                        color: '#FFFFFF', fontSize: 16, isSolid: false
-                    });
-                    saveState();
-                }
-                return;
-            }
 
             const clickedObject = levelObjects.find(obj => mouseX >= obj.x && mouseX <= obj.x + obj.width && mouseY >= obj.y && mouseY <= obj.y + obj.height);
 
@@ -719,9 +827,9 @@
                 if (currentBlockType === 'select') {
                     selectedObjectId = clickedObject ? clickedObject.id : null;
                     selectedTimelineEventId = null;
-                    if (clickedObject && (clickedObject.type === 'platform' || clickedObject.type === 'delay')) {
-                        movePathState.isSetting = true;
-                        movePathState.sourceObjectId = clickedObject.id;
+                    if (clickedObject) {
+                        pathCreationState.isCreating = true;
+                        pathCreationState.sourceObjectId = clickedObject.id;
                     }
                     updateSettingsPanel();
                     updateTimelineSettingsPanel();
@@ -745,16 +853,26 @@
 
         function mouseUpHandler(e) {
             if (!editorMode) return;
-            if (movePathState.isSetting) { 
-                const sourceObject = levelObjects.find(obj => obj.id === movePathState.sourceObjectId);
+            if (pathCreationState.isCreating) { 
+                const sourceObject = levelObjects.find(obj => obj.id === pathCreationState.sourceObjectId);
                 if (sourceObject) {
-                    sourceObject.movePath = { start: { x: sourceObject.x, y: sourceObject.y }, end: { x: mouseX - sourceObject.width / 2, y: mouseY - sourceObject.height / 2 } };
-                    sourceObject.moveSpeed = 2; sourceObject.moveDirection = 1;
-                    saveState();
+                    const dx = mouseX - (sourceObject.x + sourceObject.width / 2);
+                    const dy = mouseY - (sourceObject.y + sourceObject.height / 2);
+                    if (dx*dx + dy*dy > 100) { // Only create path if dragged far enough
+                        sourceObject.movePath = { 
+                            start: { x: sourceObject.x, y: sourceObject.y }, 
+                            end: { x: mouseX - sourceObject.width / 2, y: mouseY - sourceObject.height / 2 } 
+                        };
+                        sourceObject.moveSpeed = parseFloat(platformSpeedSlider.value); 
+                        sourceObject.moveDirection = 1;
+                        saveState();
+                    }
                 }
-                movePathState.isSetting = false; movePathState.sourceObjectId = null;
+                pathCreationState.isCreating = false; 
+                pathCreationState.sourceObjectId = null;
                 return;
             }
+
             if (!isDragging || linkingState.isLinking) return;
             isDragging = false;
             const endX = Math.floor(mouseX / gridSize) * gridSize + gridSize;
@@ -781,6 +899,16 @@
                   if(newObject.type === 'music') {
                     newObject.width = gridSize; newObject.height = gridSize;
                     newObject.color = '#3399ff'; newObject.isSolid = false;
+                 }
+                 if(newObject.type === 'text_block') {
+                    newObject.content = "Text";
+                    newObject.fontSize = 32;
+                    newObject.fontFamily = "'Courier New', Courier, monospace";
+                    newObject.textColor = '#FFFFFF';
+                    newObject.glowColor = '#000000';
+                    newObject.glowSize = 0;
+                    newObject.color = '#333333';
+                    newObject.isSolid = false; // Usually text blocks are not solid
                  }
                  if(newObject.type === 'button') { newObject.activated = false; newObject.color = '#ff0000'; }
                  if(newObject.type === 'decay') { newObject.phased = false; newObject.color = '#444444'; }
@@ -816,25 +944,22 @@
             }
         });
         
-        textContentInput.addEventListener('input', (e) => {
-            if (selectedObjectId) {
+        // --- TEXT BLOCK SETTINGS LISTENERS ---
+        function updateSelectedTextBlock(prop, value) {
+             if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
-                if (selectedObject && selectedObject.type === 'text') {
-                    selectedObject.content = e.target.value;
+                if (selectedObject && selectedObject.type === 'text_block') {
+                    selectedObject[prop] = value;
                     saveState();
                 }
             }
-        });
-
-        fontSizeInput.addEventListener('input', (e) => {
-            if (selectedObjectId) {
-                const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
-                if (selectedObject && selectedObject.type === 'text') {
-                    selectedObject.fontSize = parseInt(e.target.value, 10);
-                    saveState();
-                }
-            }
-        });
+        }
+        textContentInput.addEventListener('input', (e) => updateSelectedTextBlock('content', e.target.value));
+        fontSizeInput.addEventListener('input', (e) => updateSelectedTextBlock('fontSize', parseInt(e.target.value, 10)));
+        fontFamilySelect.addEventListener('change', (e) => updateSelectedTextBlock('fontFamily', e.target.value));
+        textColorPicker.addEventListener('input', (e) => updateSelectedTextBlock('textColor', e.target.value));
+        textGlowColorPicker.addEventListener('input', (e) => updateSelectedTextBlock('glowColor', e.target.value));
+        textGlowSizeInput.addEventListener('input', (e) => updateSelectedTextBlock('glowSize', parseInt(e.target.value, 10)));
 
         laserDirectionSelect.addEventListener('change', (e) => {
              if (selectedObjectId) {
@@ -883,24 +1008,86 @@
         });
         
         laserSpeedSlider.addEventListener('input', (e) => { levelSettings.laserSpeed = parseFloat(e.target.value); });
+        platformSpeedSlider.addEventListener('input', (e) => { levelSettings.platformSpeed = parseFloat(e.target.value); });
         playerSpeedSlider.addEventListener('input', (e) => { levelSettings.playerMaxSpeed = parseFloat(e.target.value); applySettingsToPlayer(); });
         playerAccelSlider.addEventListener('input', (e) => { levelSettings.playerAcceleration = parseFloat(e.target.value); applySettingsToPlayer(); });
         playerJumpSlider.addEventListener('input', (e) => { levelSettings.playerJumpPower = parseFloat(e.target.value); applySettingsToPlayer(); });
         
         laserSpeedSlider.addEventListener('change', saveState);
+        platformSpeedSlider.addEventListener('change', saveState);
         playerSpeedSlider.addEventListener('change', saveState);
         playerAccelSlider.addEventListener('change', saveState);
         playerJumpSlider.addEventListener('change', saveState);
 
         backgroundColorPicker.addEventListener('input', (e) => {
             if(editorMode) {
+                clearBackgroundMedia();
                 levelSettings.backgroundColor = e.target.value;
                 canvas.style.backgroundColor = e.target.value;
             }
         });
-        backgroundColorPicker.addEventListener('change', (e) => {
-            if (editorMode) saveState();
+        backgroundColorPicker.addEventListener('change', (e) => { if (editorMode) saveState(); });
+
+        setBackgroundImageBtn.addEventListener('click', () => backgroundImageInput.click());
+        setBackgroundVideoBtn.addEventListener('click', () => backgroundVideoInput.click());
+
+        clearBackgroundBtn.addEventListener('click', () => {
+            clearBackgroundMedia();
+            saveState();
         });
+        
+        function clearBackgroundMedia() {
+            levelSettings.backgroundImageSrc = null;
+            levelSettings.backgroundVideoSrc = null;
+            levelBackgroundImage = null;
+            backgroundVideo.src = ''; // Just clear the src
+        }
+
+        backgroundImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    clearBackgroundMedia();
+                    levelSettings.backgroundImageSrc = event.target.result;
+                    loadBackgroundMedia();
+                    saveState();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        backgroundVideoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    clearBackgroundMedia();
+                    levelSettings.backgroundVideoSrc = event.target.result;
+                    loadBackgroundMedia();
+                    saveState();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function loadBackgroundMedia() {
+            // Set canvas background color as a fallback
+            canvas.style.backgroundColor = levelSettings.backgroundColor || '#000000';
+            
+            // Clear old media
+            levelBackgroundImage = null;
+            backgroundVideo.src = '';
+            
+            if (levelSettings.backgroundVideoSrc) {
+                backgroundVideo.src = levelSettings.backgroundVideoSrc;
+                backgroundVideo.play();
+            } else if (levelSettings.backgroundImageSrc) {
+                levelBackgroundImage = new Image();
+                levelBackgroundImage.src = levelSettings.backgroundImageSrc;
+            }
+        }
+
 
         hookEnabledCheckbox.addEventListener('change', (e) => {
             if (editorMode) {
@@ -908,6 +1095,18 @@
                 saveState();
             }
         });
+        
+        addTextEventBtn.addEventListener('click', () => {
+            currentTimelineEventType = 'text';
+            addTextEventBtn.classList.add('active');
+            addColorEventBtn.classList.remove('active');
+        });
+        addColorEventBtn.addEventListener('click', () => {
+            currentTimelineEventType = 'background_color';
+            addColorEventBtn.classList.add('active');
+            addTextEventBtn.classList.remove('active');
+        });
+
 
         timelineCanvas.addEventListener('mousedown', (e) => {
             if (!editorMode) return;
@@ -937,14 +1136,18 @@
 
             if (!clickedOnEvent) {
                 selectedTimelineEventId = Date.now();
-                levelSettings.timelineEvents.push({
+                const newEvent = {
                     id: selectedTimelineEventId,
+                    type: currentTimelineEventType,
                     startTime: time,
                     duration: 10,
-                    text: 'New Event',
-                    fontSize: 24,
-                    color: '#FFFFFF'
-                });
+                };
+                if(currentTimelineEventType === 'text') {
+                    Object.assign(newEvent, { text: 'New Event', fontSize: 24, color: '#FFFFFF' });
+                } else { // background_color
+                    Object.assign(newEvent, { color: '#0000FF' });
+                }
+                levelSettings.timelineEvents.push(newEvent);
                 timelineDragState = { isDragging: true, isResizing: null, targetId: selectedTimelineEventId, offset: 0 };
             }
             updateSettingsPanel();
@@ -1019,6 +1222,10 @@
             const event = levelSettings.timelineEvents.find(ev => ev.id === selectedTimelineEventId);
             if(event) { event.color = e.target.value; saveState(); }
         });
+         eventBgColorInput.addEventListener('input', e => {
+            const event = levelSettings.timelineEvents.find(ev => ev.id === selectedTimelineEventId);
+            if(event) { event.color = e.target.value; saveState(); }
+        });
         
         closeSettingsPanelBtn.addEventListener('click', () => {
             selectedObjectId = null;
@@ -1084,9 +1291,12 @@
             levelObjects = data.objects;
             levelSettings = data.settings;
             
-            if (levelSettings.hookEnabled === undefined) {
-                levelSettings.hookEnabled = false;
-            }
+            if (levelSettings.hookEnabled === undefined) { levelSettings.hookEnabled = false; }
+            if (levelSettings.backgroundVideoSrc === undefined) { levelSettings.backgroundVideoSrc = null; }
+            if (levelSettings.backgroundImageSrc === undefined) { levelSettings.backgroundImageSrc = null; }
+            if (levelSettings.platformSpeed === undefined) { levelSettings.platformSpeed = 2; }
+
+
             hookEnabledCheckbox.checked = levelSettings.hookEnabled;
 
             activeAudio = {};
@@ -1099,15 +1309,14 @@
             });
 
             laserSpeedSlider.value = levelSettings.laserSpeed;
+            platformSpeedSlider.value = levelSettings.platformSpeed;
             playerSpeedSlider.value = levelSettings.playerMaxSpeed;
             playerAccelSlider.value = levelSettings.playerAcceleration;
             playerJumpSlider.value = levelSettings.playerJumpPower;
 
-            if (levelSettings.backgroundColor) {
-                canvas.style.backgroundColor = levelSettings.backgroundColor;
-                backgroundColorPicker.value = levelSettings.backgroundColor;
-            }
-
+            backgroundColorPicker.value = levelSettings.backgroundColor || '#000000';
+            loadBackgroundMedia();
+            
             applySettingsToPlayer();
             saveState(); 
             drawTimeline();
@@ -1133,7 +1342,16 @@
         function detachHook() {
             hookState.isHooked = false;
             hookState.isFiring = false;
-            player.jumpsMade = 1; // Prevent double jump immediately after detach
+            hookState.attachedObjectId = null;
+
+            const speed = Math.sqrt(player.velocityX * player.velocityX + player.velocityY * player.velocityY);
+            
+            if (speed > 10) {
+                player.velocityX *= 1.1;
+                player.velocityY *= 1.1;
+            }
+            
+            player.jumpsMade = 0;
         }
 
         function updateHook() {
@@ -1142,14 +1360,14 @@
             hookState.x += hookState.velocityX;
             hookState.y += hookState.velocityY;
 
-            // Check collision with platforms
             for (const obj of levelObjects) {
-                if (obj.type === 'platform' &&
+                if (obj.isSolid && (obj.type === 'platform' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased)) &&
                     hookState.x >= obj.x && hookState.x <= obj.x + obj.width &&
                     hookState.y >= obj.y && hookState.y <= obj.y + obj.height) {
                     
                     hookState.isFiring = false;
                     hookState.isHooked = true;
+                    hookState.attachedObjectId = obj.id;
                     
                     const dx = (player.x + player.width / 2) - hookState.x;
                     const dy = (player.y + player.height / 2) - hookState.y;
@@ -1158,12 +1376,11 @@
                 }
             }
 
-            // Check max range
             const dxRange = hookState.x - hookState.startX;
             const dyRange = hookState.y - hookState.startY;
             const distTraveled = Math.sqrt(dxRange*dxRange + dyRange*dyRange);
             if (distTraveled >= hookState.maxLength) {
-                hookState.isFiring = false; // Reset hook
+                hookState.isFiring = false;
             }
         }
         
@@ -1185,10 +1402,11 @@
 
         function drawLevelObjects() {
             levelObjects.forEach(obj => {
-                if (!editorMode && obj.isSolid === false) { return; }
+                if (!editorMode && obj.isSolid === false && obj.type !== 'text_block') { return; }
                 let color = obj.color || '#999';
                 ctx.fillStyle = color;
                 ctx.globalAlpha = (editorMode && obj.isSolid === false) ? 0.5 : 1.0;
+
                 switch(obj.type) {
                     case 'platform': case 'spawn': case 'laser_source': case 'end':
                         ctx.fillRect(obj.x, obj.y, obj.width, obj.height); break;
@@ -1201,8 +1419,27 @@
                         ctx.fillRect(obj.x + obj.width * 0.55, obj.y + obj.height * 0.2, obj.width * 0.1, obj.height * 0.5);
                         ctx.fillRect(obj.x + obj.width * 0.4, obj.y + obj.height * 0.2, obj.width * 0.25, obj.height*0.1);
                         break;
-                    case 'text':
-                        ctx.font = `${obj.fontSize || 16}px 'Courier New'`; ctx.fillText(obj.content || '', obj.x, obj.y); break;
+                    case 'text_block':
+                        // Draw container in editor mode
+                        if (editorMode) {
+                            ctx.fillStyle = obj.color || '#333333';
+                            ctx.globalAlpha = 0.5;
+                            ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                            ctx.globalAlpha = 1.0;
+                        }
+                        // Draw text content
+                        ctx.save();
+                        ctx.font = `${obj.fontSize || 32}px ${obj.fontFamily || "'Courier New'"}`;
+                        ctx.fillStyle = obj.textColor || '#FFFFFF';
+                        if (obj.glowSize > 0) {
+                            ctx.shadowColor = obj.glowColor || '#000000';
+                            ctx.shadowBlur = obj.glowSize || 0;
+                        }
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(obj.content || '', obj.x + obj.width/2, obj.y + obj.height/2);
+                        ctx.restore(); // Resets shadow properties
+                        break;
                     case 'spike':
                         ctx.beginPath();
                         let o = obj.orientation || 'up';
@@ -1259,8 +1496,8 @@
                 if (isSelectionRotated) [rectW, rectH] = [rectH, rectW];
                 ctx.fillRect(Math.min(dragStartX, endX), Math.min(dragStartY, endY), rectW, rectH);
             }
-            if (movePathState.isSetting) {
-                const sourceObject = levelObjects.find(obj => obj.id === movePathState.sourceObjectId);
+            if (pathCreationState.isCreating) {
+                const sourceObject = levelObjects.find(obj => obj.id === pathCreationState.sourceObjectId);
                 if (sourceObject) {
                     ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)'; ctx.lineWidth = 3;
                     ctx.beginPath();
@@ -1322,14 +1559,54 @@
         }
         
         function drawActiveTextEvents() {
-            levelSettings.timelineEvents.forEach(event => {
-                if (gameTime >= event.startTime && gameTime < event.startTime + event.duration) {
-                    ctx.fillStyle = event.color || '#FFFFFF';
-                    ctx.font = `${event.fontSize || 24}px 'Courier New'`;
-                    ctx.textAlign = 'center';
-                    ctx.fillText(event.text, camera.x + canvas.width / 2, camera.y + canvas.height / 4);
-                }
+            const activeTextEvents = levelSettings.timelineEvents.filter(event => 
+                event.type === 'text' && gameTime >= event.startTime && gameTime < event.startTime + event.duration);
+
+            activeTextEvents.forEach(event => {
+                ctx.fillStyle = event.color || '#FFFFFF';
+                ctx.font = `${event.fontSize || 24}px 'Courier New'`;
+                ctx.textAlign = 'center';
+                ctx.fillText(event.text, camera.x + canvas.width / 2, camera.y + canvas.height / 4);
             });
+        }
+        
+        function lerpColor(a, b, amount) { 
+            const ar = a >> 16, ag = a >> 8 & 0xff, ab = a & 0xff,
+                  br = b >> 16, bg = b >> 8 & 0xff, bb = b & 0xff,
+                  rr = ar + amount * (br - ar),
+                  rg = ag + amount * (bg - ag),
+                  rb = ab + amount * (bb - ab);
+            return (rr << 16 | rg << 8 | rb | 0).toString(16).padStart(6, '0');
+        };
+
+        function updateBackgroundColor() {
+            if (levelSettings.backgroundImageSrc || levelSettings.backgroundVideoSrc) return; // Don't run if media background is set
+
+            const colorEvents = levelSettings.timelineEvents.filter(e => e.type === 'background_color').sort((a,b) => a.startTime - b.startTime);
+            let currentEvent = null;
+            let nextEvent = null;
+
+            for (let i = 0; i < colorEvents.length; i++) {
+                if (gameTime >= colorEvents[i].startTime) {
+                    currentEvent = colorEvents[i];
+                    if (i + 1 < colorEvents.length) {
+                        nextEvent = colorEvents[i+1];
+                    }
+                }
+            }
+            
+            if (currentEvent) {
+                if (nextEvent) {
+                    const progress = (gameTime - currentEvent.startTime) / (nextEvent.startTime - currentEvent.startTime);
+                    const color1 = parseInt(currentEvent.color.substring(1), 16);
+                    const color2 = parseInt(nextEvent.color.substring(1), 16);
+                    canvas.style.backgroundColor = `#${lerpColor(color1, color2, Math.min(1, progress))}`;
+                } else {
+                    canvas.style.backgroundColor = currentEvent.color;
+                }
+            } else {
+                 canvas.style.backgroundColor = levelSettings.backgroundColor;
+            }
         }
 
         function drawTimeline() {
@@ -1340,7 +1617,7 @@
             levelSettings.timelineEvents.forEach(event => {
                 const x = (event.startTime / TIMELINE_MAX_SECONDS) * timelineCanvas.width;
                 const width = (event.duration / TIMELINE_MAX_SECONDS) * timelineCanvas.width;
-                timelineCtx.fillStyle = '#ADD8E6';
+                timelineCtx.fillStyle = event.type === 'text' ? '#ADD8E6' : '#FFB6C1';
                 timelineCtx.fillRect(x, 0, width, timelineCanvas.height);
                 if (event.id === selectedTimelineEventId) {
                     timelineCtx.strokeStyle = 'yellow';
@@ -1363,12 +1640,70 @@
                 } else {
                     gameTime += 1 / 60;
                     gameTimerDisplay.textContent = gameTime.toFixed(2);
+                    updateBackgroundColor();
                     
                     if (levelSettings.hookEnabled) {
                         updateHook();
                     }
+
+                    const isPlayerHooked = hookState.isHooked;
+                    const hookedPlatformId = hookState.attachedObjectId;
+
+                    // --- LASER LOGIC: ALWAYS MOVES ---
+                    levelObjects.forEach(laserSource => {
+                        if(laserSource.type === 'laser_source' && laserSource.isActive) {
+                            let o = laserSource.orientation || 'left';
+                            if(o === 'left' || o === 'up') laserSource.position += levelSettings.laserSpeed;
+                            else laserSource.position -= levelSettings.laserSpeed;
+
+                            let laserHitbox;
+                            if(o === 'left') laserHitbox = {x: laserSource.position, y: 0, width: 10, height: worldHeight};
+                            if(o === 'right') laserHitbox = {x: laserSource.position - 10, y: 0, width: 10, height: worldHeight};
+                            if(o === 'up') laserHitbox = {x: 0, y: laserSource.position, width: worldWidth, height: 10};
+                            if(o === 'down') laserHitbox = {x: 0, y: laserSource.position - 10, width: worldWidth, height: 10};
+                            if(laserHitbox && checkRectCollision(player, laserHitbox)) resetPlayer();
+                        }
+                    });
+
+
+                    // --- MOVING PLATFORM LOGIC ---
+                    levelObjects.forEach(obj => {
+                        if (obj.movePath) {
+                            if (isPlayerHooked && obj.id !== hookedPlatformId) {
+                                return; // This stops other platforms from moving.
+                            }
+
+                            const target = obj.moveDirection === 1 ? obj.movePath.end : obj.movePath.start;
+                            const dx = target.x - obj.x, dy = target.y - obj.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            const speed = obj.moveSpeed || levelSettings.platformSpeed;
+                            
+                            let moveX = 0, moveY = 0;
+                            if (dist >= speed) {
+                                moveX = (dx / dist) * speed;
+                                moveY = (dy / dist) * speed;
+                            }
+
+                            if (isPlayerHooked && obj.id === hookedPlatformId) {
+                                player.x += moveX; player.y += moveY;
+                                hookState.x += moveX; hookState.y += moveY;
+                            } else if (!isPlayerHooked) {
+                                const preMovePlayerHitbox = {x: player.x, y: player.y, width: player.width, height: player.height + 1};
+                                if (checkRectCollision(preMovePlayerHitbox, obj)) {
+                                    player.x += moveX; player.y += moveY;
+                                }
+                            }
+
+                            if (dist < speed) {
+                                obj.x = target.x; obj.y = target.y; 
+                                obj.moveDirection *= -1;
+                            } else {
+                                obj.x += moveX; obj.y += moveY;
+                            }
+                        }
+                    });
                     
-                    if (hookState.isHooked) {
+                    if (isPlayerHooked) {
                         // --- SWINGING PHYSICS ---
                         if (keys.d) player.velocityX += 0.2;
                         if (keys.a) player.velocityX -= 0.2;
@@ -1379,7 +1714,35 @@
 
                         player.velocityY += gravity;
                         player.x += player.velocityX;
+
+                        // --- ROBUST: Horizontal Collision detection during swing ---
+                        levelObjects.forEach(obj => {
+                            if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
+                                if (player.velocityX > 0 && player.x - player.velocityX + player.width <= obj.x + 1) {
+                                    player.x = obj.x - player.width;
+                                    player.velocityX = 0;
+                                } else if (player.velocityX < 0 && player.x - player.velocityX >= obj.x + obj.width - 1) {
+                                    player.x = obj.x + obj.width;
+                                    player.velocityX = 0;
+                                }
+                            }
+                        });
+
                         player.y += player.velocityY;
+
+                        // --- ROBUST: Vertical Collision detection during swing ---
+                        levelObjects.forEach(obj => {
+                            if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
+                                if (player.velocityY > 0 && player.y - player.velocityY + player.height <= obj.y + 1) {
+                                    player.y = obj.y - player.height;
+                                    player.velocityY = 0;
+                                } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) {
+                                    player.y = obj.y + obj.height;
+                                    player.velocityY = 0;
+                                }
+                            }
+                        });
+
                         player.velocityX *= 0.995; // Air friction
 
                         const playerCenterX = player.x + player.width / 2;
@@ -1405,36 +1768,6 @@
                     } else {
                         // --- NORMAL PLATFORMING PHYSICS ---
                         let onGround = false;
-                        
-                        levelObjects.forEach(obj => {
-                            if (obj.movePath) {
-                                const target = obj.moveDirection === 1 ? obj.movePath.end : obj.movePath.start;
-                                const dx = target.x - obj.x, dy = target.y - obj.y;
-                                const dist = Math.sqrt(dx * dx + dy * dy);
-                                if (dist < obj.moveSpeed) {
-                                    obj.x = target.x; obj.y = target.y; obj.moveDirection *= -1;
-                                } else {
-                                    const moveX = (dx / dist) * obj.moveSpeed, moveY = (dy / dist) * obj.moveSpeed;
-                                    obj.x += moveX; obj.y += moveY;
-                                    if (checkRectCollision(player, { ...obj, y: obj.y - moveY, x: obj.x - moveX })) { player.x += moveX; player.y += moveY; }
-                                }
-                            }
-                        });
-                        
-                        levelObjects.forEach(laserSource => {
-                            if(laserSource.type === 'laser_source' && laserSource.isActive) {
-                                let o = laserSource.orientation || 'left';
-                                if(o === 'left' || o === 'up') laserSource.position += levelSettings.laserSpeed;
-                                else laserSource.position -= levelSettings.laserSpeed;
-
-                                let laserHitbox;
-                                if(o === 'left') laserHitbox = {x: laserSource.position, y: 0, width: 10, height: worldHeight};
-                                if(o === 'right') laserHitbox = {x: laserSource.position - 10, y: 0, width: 10, height: worldHeight};
-                                if(o === 'up') laserHitbox = {x: 0, y: laserSource.position, width: worldWidth, height: 10};
-                                if(o === 'down') laserHitbox = {x: 0, y: laserSource.position - 10, width: worldWidth, height: 10};
-                                if(laserHitbox && checkRectCollision(player, laserHitbox)) resetPlayer();
-                            }
-                        });
                         
                         const touchingHitbox = { x: player.x - 1, y: player.y - 1, width: player.width + 2, height: player.height + 2 };
                         levelObjects.forEach(obj => {
@@ -1550,7 +1883,7 @@
                                     if (jumpBufferCounter > 0) {
                                         player.velocityY = -player.jumpPower; player.jumpsMade = 1; jumpBufferCounter = 0;
                                     }
-                                } else if (player.velocityY < 0) {
+                                } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) {
                                     player.y = obj.y + obj.height; player.velocityY = 0;
                                 }
                             }
@@ -1608,6 +1941,10 @@
                      
                     if (player.x < 0) player.x = 0;
                     if (player.x + player.width > worldWidth) player.x = worldWidth - player.width;
+                    
+                    if (player.y > worldHeight) {
+                        resetPlayer();
+                    }
                 }
             } else { // editorMode is true
                 if (keys.d) camera.x += editorCameraSpeed; if (keys.a) camera.x -= editorCameraSpeed;
@@ -1631,8 +1968,30 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
+            // Draw background video/image directly to canvas in SCREEN space
+            // This makes the background fixed to the camera view and mimics object-fit: cover
+            if (levelSettings.backgroundVideoSrc && !backgroundVideo.paused && backgroundVideo.readyState >= 3) {
+                const ar = backgroundVideo.videoWidth / backgroundVideo.videoHeight;
+                const cr = canvas.width / canvas.height;
+                let dw = canvas.width, dh = canvas.height;
+                let ox = 0, oy = 0;
+                if (ar > cr) { dw = canvas.height * ar; ox = (canvas.width - dw) / 2; } 
+                else { dh = canvas.width / ar; oy = (canvas.height - dh) / 2; }
+                ctx.drawImage(backgroundVideo, ox, oy, dw, dh);
+            } else if (levelBackgroundImage && levelBackgroundImage.complete) {
+                const ar = levelBackgroundImage.width / levelBackgroundImage.height;
+                const cr = canvas.width / canvas.height;
+                let dw = canvas.width, dh = canvas.height;
+                let ox = 0, oy = 0;
+                if (ar > cr) { dw = canvas.height * ar; ox = (canvas.width - dw) / 2; } 
+                else { dh = canvas.width / ar; oy = (canvas.height - dh) / 2; }
+                ctx.drawImage(levelBackgroundImage, ox, oy, dw, dh);
+            }
+            
             ctx.save();
             ctx.translate(-camera.x, -camera.y);
+
+            // The background color is handled by the canvas style, so no need to fillRect here
 
             drawLevelObjects();
             
@@ -1688,14 +2047,17 @@
         const tutorialLevel = {
             settings: {
                 laserSpeed: 1.5, playerMaxSpeed: 5, playerAcceleration: 0.4, playerJumpPower: 13,
+                platformSpeed: 2,
                 backgroundColor: '#1a2a3a',
                 hookEnabled: true,
                 timelineEvents: [
-                    { id: 1, startTime: 1, duration: 5, text: "Use A/D to move, SPACE to jump.", fontSize: 24, color: '#FFFFFF' },
-                    { id: 2, startTime: 7, duration: 5, text: "Aim with the mouse and press E to grapple.", fontSize: 24, color: '#FFFFFF' },
-                    { id: 3, startTime: 13, duration: 5, text: "Use W/S while hooked to reel in or out.", fontSize: 24, color: '#FFFFFF' },
-                    { id: 4, startTime: 19, duration: 5, text: "Jump to the high platform!", fontSize: 24, color: '#FFFFFF' },
-                ]
+                    { id: 1, type: 'text', startTime: 1, duration: 5, text: "Use A/D to move, SPACE to jump.", fontSize: 24, color: '#FFFFFF' },
+                    { id: 2, type: 'text', startTime: 7, duration: 5, text: "Aim with the mouse and press E to grapple.", fontSize: 24, color: '#FFFFFF' },
+                    { id: 3, type: 'text', startTime: 13, duration: 5, text: "Use W/S while hooked to reel in or out.", fontSize: 24, color: '#FFFFFF' },
+                    { id: 4, type: 'text', startTime: 19, duration: 5, text: "Swing fast and press E to fly!", fontSize: 24, color: '#FFFFFF' },
+                ],
+                backgroundImageSrc: null,
+                backgroundVideoSrc: null,
             },
             objects: [
                 { id: 10, type: 'platform', x: 0, y: worldHeight - 40, width: 400, height: 40, color: '#cccccc', isSolid: true },
@@ -1741,12 +2103,16 @@
             </ul>
         `;
 
-        canvas.style.backgroundColor = levelSettings.backgroundColor;
-        
+        loadBackgroundMedia();
+        addTextEventBtn.classList.add('active');
+
         saveState();
         resetPlayer();
         update();
     </script>
 </body>
 </html>
+
+
+
 
