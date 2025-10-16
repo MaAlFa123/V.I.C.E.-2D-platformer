@@ -19,7 +19,7 @@
             background-color: #f0f2f5;
             font-family: 'Courier New', Courier, monospace;
         }
-        #main-menu {
+        #main-menu, #multiplayer-menu {
             position: fixed;
             top: 0;
             left: 0;
@@ -34,11 +34,11 @@
             z-index: 100;
             gap: 20px;
         }
-        #main-menu h1 {
+        #main-menu h1, #multiplayer-menu h1 {
             font-size: 3em;
             color: #333;
         }
-        #main-menu p {
+        #main-menu p, #multiplayer-menu p {
             font-size: 1.2em;
             color: #555;
             margin-bottom: 20px;
@@ -49,11 +49,18 @@
             gap: 15px;
             align-items: center;
         }
-        #editor-wrapper, #controls-container {
+        .menu-controls input {
+            padding: 10px;
+            font-size: 1em;
+            width: 250px;
+            text-align: center;
+            border: 2px solid #555;
+            border-radius: 5px;
+        }
+        #editor-wrapper, #controls-container, #multiplayer-menu, #lobby-screen {
             display: none; /* Hidden by default, shown by JS */
         }
         #editor-wrapper {
-            /* display: flex; */
             flex-direction: row;
             align-items: flex-start;
             gap: 20px;
@@ -114,7 +121,6 @@
         }
         #controls-container {
             margin-top: 15px;
-            /* display: flex; */
             flex-direction: column;
             align-items: center;
             gap: 10px;
@@ -263,6 +269,88 @@
             gap: 10px;
             margin-top: 10px;
         }
+
+        /* Multiplayer & Lobby Styles */
+        #lobby-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f2f5;
+            z-index: 101;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        #lobby-info h2 {
+            margin-bottom: 10px;
+        }
+        #lobby-code {
+            background: #fff;
+            padding: 5px 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        #player-list {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+        }
+        .player-slot {
+            width: 120px;
+            height: 50px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #888;
+        }
+        .player-slot.filled {
+            border-style: solid;
+            border-color: #555;
+            color: #333;
+            font-weight: bold;
+        }
+        #chat-container {
+            width: 400px;
+            height: 200px;
+            border: 1px solid #ccc;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            border-radius: 5px;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        #chat-messages div {
+            margin-bottom: 5px;
+        }
+        #chat-messages b {
+            margin-right: 5px;
+        }
+        #chat-input-form {
+            display: flex;
+        }
+        #chat-input {
+            flex-grow: 1;
+            border: none;
+            border-top: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 0 0 0 5px;
+        }
+        #chat-input-form button {
+             border-radius: 0 0 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -275,10 +363,47 @@
         </div>
         <div id="play-submenu" class="menu-controls" style="display: none;">
             <button id="tutorial-btn">Tutorial</button>
-            <button id="fan-level-btn">FAN Level</button>
+            <button id="fan-level-btn">Multiplayer</button>
             <button id="back-to-main-btn">Back</button>
         </div>
     </div>
+
+    <div id="multiplayer-menu">
+         <h1>Multiplayer</h1>
+         <div class="menu-controls">
+            <button id="create-lobby-btn">Create Lobby</button>
+            <input type="text" id="join-code-input" placeholder="Enter Lobby Code">
+            <button id="join-lobby-btn">Join Lobby</button>
+            <button id="back-to-play-menu-btn">Back</button>
+         </div>
+    </div>
+
+    <div id="lobby-screen">
+        <div id="lobby-info">
+            <h2>Lobby Code: <span id="lobby-code"></span></h2>
+        </div>
+        <h3>Players:</h3>
+        <ul id="player-list">
+            <li class="player-slot" id="player-slot-0">Empty</li>
+            <li class="player-slot" id="player-slot-1">Empty</li>
+            <li class="player-slot" id="player-slot-2">Empty</li>
+            <li class="player-slot" id="player-slot-3">Empty</li>
+        </ul>
+         <div class="menu-controls">
+            <input type="text" id="username-input" placeholder="Enter Username">
+            <button id="set-username-btn">Set Username</button>
+        </div>
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+            <form id="chat-input-form">
+                <input type="text" id="chat-input" placeholder="Type a message...">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+        <button id="start-game-btn" style="display:none;">Start Game</button>
+         <button id="leave-lobby-btn">Leave Lobby</button>
+    </div>
+
     <div id="editor-wrapper">
         <div id="game-container">
             <video id="background-video" loop muted playsinline></video>
@@ -319,6 +444,10 @@
                     <input type="color" id="text-glow-color-picker" value="#000000">
                      <label for="text-glow-size-input">Glow Size:</label>
                     <input type="number" id="text-glow-size-input" min="0" max="50" value="0">
+                    <div class="settings-row">
+                         <input type="checkbox" id="show-on-trigger-checkbox">
+                         <label for="show-on-trigger-checkbox">Show on Trigger</label>
+                    </div>
                 </div>
                 <div id="button-laser-settings" class="settings-section" style="display: none;">
                     <label for="laser-direction-select">Set Laser Direction:</label>
@@ -362,8 +491,9 @@
             <button class="tool-btn" data-type="button">Button</button>
             <button class="tool-btn" data-type="decay">Decay Block</button>
             <button class="tool-btn" data-type="delay">Delay Block</button>
-             <button class="tool-btn" data-type="text_block">Text Block</button>
-             <button class="tool-btn" data-type="music">Music</button>
+            <button class="tool-btn" data-type="text_block">Text Block</button>
+            <button class="tool-btn" data-type="music">Music</button>
+            <button class="tool-btn" data-type="grappler">Grappler</button>
             <button class="tool-btn" data-type="spawn">Spawn</button>
             <button class="tool-btn" data-type="laser_source">Laser</button>
             <button class="tool-btn" data-type="end">End</button>
@@ -420,8 +550,39 @@
             <input type="file" id="import-file-input" accept=".json" style="display: none;">
         </div>
     </div>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, doc, setDoc, getDoc, addDoc, onSnapshot, 
+            updateDoc, deleteDoc, serverTimestamp, query, orderBy 
+        } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 
-    <script>
+        // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "${FIREBASE_API_KEY}",
+  authDomain: "${FIREBASE_AUTH_DOMAIN}",
+  projectId: "${FIREBASE_PROJECT_ID}",
+  storageBucket: "${FIREBASE_STORAGE_BUCKET}",
+  messagingSenderId: "${FIREBASE_MESSAGING_SENDER_ID}",
+  appId: "${FIREBASE_APP_ID}",
+  measurementId: "${FIREBASE_MEASUREMENT_ID}"
+};
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // Make auth and db globally accessible for the main script
+        window.firebase = { auth, db, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, collection, doc, setDoc, getDoc, addDoc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, orderBy, signInWithCustomToken };
+    </script>
+
+    <script type="module">
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const backgroundVideo = document.getElementById('background-video');
@@ -447,6 +608,7 @@
         const textColorPicker = document.getElementById('text-color-picker');
         const textGlowColorPicker = document.getElementById('text-glow-color-picker');
         const textGlowSizeInput = document.getElementById('text-glow-size-input');
+        const showOnTriggerCheckbox = document.getElementById('show-on-trigger-checkbox');
 
         // Other Object Settings
         const buttonLaserSettingsDiv = document.getElementById('button-laser-settings');
@@ -497,6 +659,35 @@
         const tutorialBtn = document.getElementById('tutorial-btn');
         const fanLevelBtn = document.getElementById('fan-level-btn');
         const backToMainBtn = document.getElementById('back-to-main-btn');
+
+        // Multiplayer UI
+        const multiplayerMenu = document.getElementById('multiplayer-menu');
+        const createLobbyBtn = document.getElementById('create-lobby-btn');
+        const joinLobbyBtn = document.getElementById('join-lobby-btn');
+        const joinCodeInput = document.getElementById('join-code-input');
+        const backToPlayMenuBtn = document.getElementById('back-to-play-menu-btn');
+        
+        // Lobby UI
+        const lobbyScreen = document.getElementById('lobby-screen');
+        const lobbyCodeDisplay = document.getElementById('lobby-code');
+        const playerList = document.getElementById('player-list');
+        const usernameInput = document.getElementById('username-input');
+        const setUsernameBtn = document.getElementById('set-username-btn');
+        const chatContainer = document.getElementById('chat-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInputForm = document.getElementById('chat-input-form');
+        const chatInput = document.getElementById('chat-input');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
+ 
+        // --- FIREBASE & MULTIPLAYER STATE ---
+        let auth, db;
+        let currentUser = null;
+        let currentLobbyId = null;
+        let unsubscribeLobby = null;
+        let unsubscribePlayers = null;
+        let unsubscribeChat = null;
+        let otherPlayers = {};
         
         let editorMode = false;
         let isPlayOnlyMode = false;
@@ -571,6 +762,8 @@
             wallDirection: 0, isCrouching: false, isDashing: false, 
             dashSpeed: 0, dashFriction: 0.2, isSprinting: false, 
             sprintMultiplier: 1.6,
+            hasHook: false, // Player starts without the hook power-up
+            username: 'Player'
         };
 
         let levelObjects = [
@@ -639,6 +832,7 @@
         function resetPlayer() {
             gameWon = false;
             gameTime = 0;
+            player.hasHook = false; // Reset hook power-up
             applySettingsToPlayer();
             detachHook();
             
@@ -656,6 +850,9 @@
                     clearTimeout(obj.activationTimeout);
                     obj.isActive = false;
                 }
+                // Reset triggered and collected states
+                if(obj.type === 'grappler') { obj.visible = false; obj.collected = false; }
+                if(obj.type === 'text_block' && obj.showOnTrigger) { obj.visible = false; }
             });
             let spawnPoint = levelObjects.find(obj => obj.type === 'spawn');
             const startPos = spawnPoint ? {x: spawnPoint.x, y: spawnPoint.y} : playerStart;
@@ -677,7 +874,7 @@
                 undo();
                 return;
             }
-            if (key === 'q' && !isPlayOnlyMode) {
+            if (key === 'q' && !isPlayOnlyMode && !currentLobbyId) {
                 editorMode = !editorMode;
                 gameTimerDisplay.style.display = editorMode ? 'none' : 'block';
                 controlsDisplay.style.display = editorMode ? 'none' : 'block';
@@ -709,7 +906,7 @@
                         player.coyoteTimeCounter = 0;
                     }
                 }
-            } else if (key === 'e' && !editorMode && levelSettings.hookEnabled && !e.repeat) {
+            } else if (key === 'e' && !editorMode && levelSettings.hookEnabled && player.hasHook && !e.repeat) {
                 e.preventDefault();
                 if (hookState.isHooked) {
                     detachHook();
@@ -758,6 +955,7 @@
                         textColorPicker.value = selectedObject.textColor || '#FFFFFF';
                         textGlowColorPicker.value = selectedObject.glowColor || '#000000';
                         textGlowSizeInput.value = selectedObject.glowSize || 0;
+                        showOnTriggerCheckbox.checked = selectedObject.showOnTrigger || false;
                     }
                      if (selectedObject.type === 'music') {
                         musicBlockSettingsDiv.style.display = 'block';
@@ -809,7 +1007,7 @@
                 if (!clickedObject) return;
                 if (clickedObject.type === 'button' && !linkingState.sourceButtonId) {
                     linkingState.sourceButtonId = clickedObject.id;
-                } else if ((['decay', 'end', 'laser_source', 'music'].includes(clickedObject.type)) && linkingState.sourceButtonId) {
+                } else if ((['decay', 'end', 'laser_source', 'music', 'text_block', 'grappler'].includes(clickedObject.type)) && linkingState.sourceButtonId) {
                     const sourceButton = levelObjects.find(obj => obj.id === linkingState.sourceButtonId);
                     if (sourceButton) {
                         if (!sourceButton.linkedTo) sourceButton.linkedTo = [];
@@ -900,6 +1098,11 @@
                     newObject.width = gridSize; newObject.height = gridSize;
                     newObject.color = '#3399ff'; newObject.isSolid = false;
                  }
+                 if(newObject.type === 'grappler') {
+                    newObject.width = gridSize * 2; newObject.height = gridSize * 2;
+                    newObject.color = '#9c27b0'; newObject.isSolid = false;
+                    newObject.visible = false; newObject.collected = false;
+                 }
                  if(newObject.type === 'text_block') {
                     newObject.content = "Text";
                     newObject.fontSize = 32;
@@ -908,7 +1111,9 @@
                     newObject.glowColor = '#000000';
                     newObject.glowSize = 0;
                     newObject.color = '#333333';
-                    newObject.isSolid = false; // Usually text blocks are not solid
+                    newObject.isSolid = false;
+                    newObject.showOnTrigger = false;
+                    newObject.visible = true;
                  }
                  if(newObject.type === 'button') { newObject.activated = false; newObject.color = '#ff0000'; }
                  if(newObject.type === 'decay') { newObject.phased = false; newObject.color = '#444444'; }
@@ -960,6 +1165,16 @@
         textColorPicker.addEventListener('input', (e) => updateSelectedTextBlock('textColor', e.target.value));
         textGlowColorPicker.addEventListener('input', (e) => updateSelectedTextBlock('glowColor', e.target.value));
         textGlowSizeInput.addEventListener('input', (e) => updateSelectedTextBlock('glowSize', parseInt(e.target.value, 10)));
+        showOnTriggerCheckbox.addEventListener('change', (e) => {
+            const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
+            if (selectedObject && selectedObject.type === 'text_block') {
+                selectedObject.showOnTrigger = e.target.checked;
+                if(selectedObject.showOnTrigger) {
+                    selectedObject.visible = false;
+                }
+                saveState();
+            }
+        });
 
         laserDirectionSelect.addEventListener('change', (e) => {
              if (selectedObjectId) {
@@ -1272,7 +1487,11 @@
             reader.onload = (event) => {
                 try {
                     const data = JSON.parse(event.target.result);
-                    if (data.objects && data.settings) {
+                    // Check if we are in multiplayer lobby creation flow
+                    if (window.creatingLobby) {
+                        window.creatingLobby(data);
+                        window.creatingLobby = null; // Reset flow
+                    } else if (data.objects && data.settings) {
                         loadLevelData(data, isPlayOnlyMode);
                         alert('Level loaded successfully!');
                     } else {
@@ -1402,7 +1621,7 @@
 
         function drawLevelObjects() {
             levelObjects.forEach(obj => {
-                if (!editorMode && obj.isSolid === false && obj.type !== 'text_block') { return; }
+                if (!editorMode && obj.isSolid === false && obj.type !== 'text_block' && obj.type !== 'grappler') { return; }
                 let color = obj.color || '#999';
                 ctx.fillStyle = color;
                 ctx.globalAlpha = (editorMode && obj.isSolid === false) ? 0.5 : 1.0;
@@ -1419,26 +1638,44 @@
                         ctx.fillRect(obj.x + obj.width * 0.55, obj.y + obj.height * 0.2, obj.width * 0.1, obj.height * 0.5);
                         ctx.fillRect(obj.x + obj.width * 0.4, obj.y + obj.height * 0.2, obj.width * 0.25, obj.height*0.1);
                         break;
-                    case 'text_block':
-                        // Draw container in editor mode
-                        if (editorMode) {
-                            ctx.fillStyle = obj.color || '#333333';
-                            ctx.globalAlpha = 0.5;
+                    case 'grappler':
+                        if (editorMode || (obj.visible && !obj.collected)) {
+                            ctx.globalAlpha = (editorMode && !obj.visible) ? 0.4 : 1.0;
+                            ctx.fillStyle = obj.color;
                             ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                            ctx.globalAlpha = 1.0;
+                            // Draw hook icon inside
+                            ctx.strokeStyle = 'white';
+                            ctx.lineWidth = 3;
+                            ctx.beginPath();
+                            ctx.arc(obj.x + obj.width * 0.5, obj.y + obj.height * 0.5, obj.width * 0.2, Math.PI, Math.PI * 1.8);
+                            ctx.moveTo(obj.x + obj.width * 0.5, obj.y + obj.height * 0.3);
+                            ctx.lineTo(obj.x + obj.width * 0.5, obj.y + obj.height * 0.2);
+                            ctx.lineTo(obj.x + obj.width * 0.3, obj.y + obj.height * 0.4);
+                            ctx.stroke();
                         }
-                        // Draw text content
-                        ctx.save();
-                        ctx.font = `${obj.fontSize || 32}px ${obj.fontFamily || "'Courier New'"}`;
-                        ctx.fillStyle = obj.textColor || '#FFFFFF';
-                        if (obj.glowSize > 0) {
-                            ctx.shadowColor = obj.glowColor || '#000000';
-                            ctx.shadowBlur = obj.glowSize || 0;
+                        break;
+                    case 'text_block':
+                        if(editorMode || (!obj.showOnTrigger || obj.visible)) {
+                            // Draw container in editor mode
+                            if (editorMode) {
+                                ctx.fillStyle = obj.color || '#333333';
+                                ctx.globalAlpha = 0.5;
+                                ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                                ctx.globalAlpha = 1.0;
+                            }
+                            // Draw text content
+                            ctx.save();
+                            ctx.font = `${obj.fontSize || 32}px ${obj.fontFamily || "'Courier New'"}`;
+                            ctx.fillStyle = obj.textColor || '#FFFFFF';
+                            if (obj.glowSize > 0) {
+                                ctx.shadowColor = obj.glowColor || '#000000';
+                                ctx.shadowBlur = obj.glowSize || 0;
+                            }
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(obj.content || '', obj.x + obj.width/2, obj.y + obj.height/2);
+                            ctx.restore(); // Resets shadow properties
                         }
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(obj.content || '', obj.x + obj.width/2, obj.y + obj.height/2);
-                        ctx.restore(); // Resets shadow properties
                         break;
                     case 'spike':
                         ctx.beginPath();
@@ -1546,9 +1783,47 @@
             });
         }
         
-        function drawPlayer() {
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.width, player.height);
+        function drawPlayer(p_object, isLocalPlayer) {
+             // Main body
+            ctx.fillStyle = p_object.color || '#FFFFFF';
+            ctx.fillRect(p_object.x, p_object.y, p_object.width, p_object.height);
+
+            // Black outline
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(p_object.x, p_object.y, p_object.width, p_object.height);
+            
+            // Orange Plus Sign only for local player
+            if (isLocalPlayer) {
+                ctx.fillStyle = '#FFA500';
+                const crossWidth = p_object.width * 0.2;
+                const crossLength = p_object.width * 0.6;
+                ctx.fillRect(p_object.x + (p_object.width - crossLength) / 2, p_object.y + (p_object.height - crossWidth) / 2, crossLength, crossWidth);
+                ctx.fillRect(p_object.x + (p_object.width - crossWidth) / 2, p_object.y + (p_object.height - crossLength) / 2, crossWidth, crossLength);
+            }
+
+            // Username
+            if (p_object.username) {
+                ctx.fillStyle = 'white';
+                ctx.font = '14px "Courier New"';
+                ctx.textAlign = 'center';
+                ctx.fillText(p_object.username, p_object.x + p_object.width / 2, p_object.y - 10);
+            }
+            
+            // Hook indicator
+            if (isLocalPlayer && p_object.hasHook && !hookState.isFiring && !hookState.isHooked) {
+                const iconX = p_object.x + p_object.width + 5;
+                const iconY = p_object.y + p_object.height / 2;
+                const iconSize = 15;
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(iconX, iconY, iconSize * 0.4, Math.PI * 0.9, Math.PI * 1.9);
+                ctx.moveTo(iconX, iconY - iconSize * 0.4);
+                ctx.lineTo(iconX, iconY - iconSize * 0.8);
+                ctx.lineTo(iconX - iconSize * 0.3, iconY - iconSize * 0.5);
+                ctx.stroke();
+            }
         }
 
         function drawWinMessage() {
@@ -1632,8 +1907,27 @@
                 timelineCtx.fillRect(playheadX - 1, 0, 2, timelineCanvas.height);
             }
         }
+        
+        async function updatePlayerStateInFirestore() {
+            if (!currentLobbyId || !currentUser) return;
+            const playerDocRef = firebase.doc(db, 'lobbies', currentLobbyId, 'players', currentUser.uid);
+            await firebase.updateDoc(playerDocRef, {
+                x: player.x,
+                y: player.y,
+                height: player.height,
+                width: player.width,
+                velocityX: player.velocityX,
+                velocityY: player.velocityY,
+                hasHook: player.hasHook
+            });
+        }
+        
+        let lastUpdateTime = 0;
+        const updateInterval = 1000 / 15; // 15 times per second
 
         function update() {
+            const now = performance.now();
+            
             if (!editorMode) {
                 if(gameWon) {
                     // Game is won, no updates
@@ -1642,8 +1936,13 @@
                     gameTimerDisplay.textContent = gameTime.toFixed(2);
                     updateBackgroundColor();
                     
-                    if (levelSettings.hookEnabled) {
+                    if (levelSettings.hookEnabled && player.hasHook) {
                         updateHook();
+                    }
+                    
+                    if (now - lastUpdateTime > updateInterval && currentLobbyId) {
+                        updatePlayerStateInFirestore();
+                        lastUpdateTime = now;
                     }
 
                     const isPlayerHooked = hookState.isHooked;
@@ -1892,12 +2191,18 @@
                         levelObjects.forEach(obj => {
                             if (obj.isSolid && obj.type === 'spike' && checkPlayerSpikeCollision(player, obj)) { resetPlayer(); } 
                             else if (checkRectCollision(player, obj)) {
+                                if (obj.type === 'grappler' && obj.visible && !obj.collected) {
+                                    player.hasHook = true;
+                                    obj.collected = true;
+                                }
                                 if (obj.type === 'button' && !obj.activated) {
                                     obj.activated = true;
                                     if (obj.linkedTo) {
                                         obj.linkedTo.forEach(targetId => {
                                             const targetObj = levelObjects.find(t => t.id === targetId);
                                             if(targetObj) {
+                                                if(targetObj.type === 'text_block' && targetObj.showOnTrigger) { targetObj.visible = true; }
+                                                if(targetObj.type === 'grappler') { targetObj.visible = true; }
                                                 if (targetObj.type === 'decay') {
                                                     targetObj.phased = true;
                                                     setTimeout(() => { targetObj.phased = false; obj.activated = false; }, 10000);
@@ -1969,7 +2274,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Draw background video/image directly to canvas in SCREEN space
-            // This makes the background fixed to the camera view and mimics object-fit: cover
             if (levelSettings.backgroundVideoSrc && !backgroundVideo.paused && backgroundVideo.readyState >= 3) {
                 const ar = backgroundVideo.videoWidth / backgroundVideo.videoHeight;
                 const cr = canvas.width / canvas.height;
@@ -1991,8 +2295,6 @@
             ctx.save();
             ctx.translate(-camera.x, -camera.y);
 
-            // The background color is handled by the canvas style, so no need to fillRect here
-
             drawLevelObjects();
             
             if (editorMode) {
@@ -2001,12 +2303,17 @@
                 drawChasingLaser();
             }
             
+            // Draw other players
+            for (const uid in otherPlayers) {
+                drawPlayer(otherPlayers[uid], false);
+            }
+
             if (levelSettings.hookEnabled) {
                 drawHook();
             }
 
             if(!gameWon) {
-                drawPlayer();
+                drawPlayer(player, true);
             }
             
             ctx.restore();
@@ -2023,25 +2330,34 @@
             requestAnimationFrame(update);
         }
 
-        function startGame(playOnly = false) {
+        function startGame(playOnly = false, isMultiplayer = false) {
             isPlayOnlyMode = playOnly;
             editorMode = !playOnly;
             
             mainMenu.style.display = 'none';
+            multiplayerMenu.style.display = 'none';
+            lobbyScreen.style.display = 'none';
             document.getElementById('editor-wrapper').style.display = 'flex';
             
             const controlsContainer = document.getElementById('controls-container');
-            if (playOnly) {
+            if (playOnly && !isMultiplayer) {
                 controlsContainer.style.display = 'none';
-                resetPlayer();
                 gameTimerDisplay.style.display = 'block';
                 controlsDisplay.style.display = 'block';
-            } else {
+            } else if (!playOnly) { // Editor mode
                 controlsContainer.style.display = 'flex';
                 controlsText.textContent = "EDITOR MODE [W,A,S,D to Pan | Q to Toggle]";
                 gameTimerDisplay.style.display = 'none';
                 controlsDisplay.style.display = 'none';
             }
+
+            if (isMultiplayer) {
+                controlsContainer.style.display = 'none';
+                gameTimerDisplay.style.display = 'block';
+                controlsDisplay.style.display = 'block';
+            }
+
+            resetPlayer();
         }
         
         const tutorialLevel = {
@@ -2087,10 +2403,226 @@
             loadLevelData(tutorialLevel, true);
         });
         
+        // --- MULTIPLAYER MENU LOGIC ---
         fanLevelBtn.addEventListener('click', () => {
-            isPlayOnlyMode = true;
+            playSubMenu.style.display = 'none';
+            multiplayerMenu.style.display = 'flex';
+        });
+
+        backToPlayMenuBtn.addEventListener('click', () => {
+            multiplayerMenu.style.display = 'none';
+            playSubMenu.style.display = 'flex';
+        });
+        
+        // --- FIREBASE LOGIC ---
+        function initFirebase() {
+            auth = window.firebase.auth;
+            db = window.firebase.db;
+
+            window.firebase.onAuthStateChanged(auth, user => {
+                if (user) {
+                    currentUser = user;
+                    console.log("Authenticated user:", user.uid);
+                } else {
+                    // No user is signed in. Attempt to sign in.
+                    const signIn = async () => {
+                        try {
+                            // The environment provides a token for seamless authentication
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await window.firebase.signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                // Fallback for local development or other environments
+                                await window.firebase.signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Authentication failed:", error);
+                            // Disable multiplayer if authentication fails completely
+                            const multiplayerBtn = document.getElementById('fan-level-btn');
+                            multiplayerBtn.disabled = true;
+                            multiplayerBtn.title = "Authentication failed, multiplayer is unavailable.";
+                            multiplayerBtn.style.cursor = 'not-allowed';
+                            multiplayerBtn.style.backgroundColor = '#ccc';
+                        }
+                    };
+                    signIn();
+                }
+            });
+        }
+        
+        // Generate a simple 4-char lobby code
+        function generateLobbyCode() {
+            return Math.random().toString(36).substring(2, 6).toUpperCase();
+        }
+
+        createLobbyBtn.addEventListener('click', () => {
+            if (!currentUser) {
+                alert("Not authenticated. Please wait a moment.");
+                return;
+            }
+            // Temporarily store a function to be called after file is loaded
+            window.creatingLobby = async (levelData) => {
+                const lobbyId = generateLobbyCode();
+                const lobbyRef = firebase.doc(db, 'lobbies', lobbyId);
+                
+                try {
+                    await firebase.setDoc(lobbyRef, {
+                        ownerId: currentUser.uid,
+                        levelData: JSON.stringify(levelData),
+                        gameState: 'waiting',
+                        createdAt: firebase.serverTimestamp()
+                    });
+                    await joinLobby(lobbyId);
+                } catch (error) {
+                    console.error("Error creating lobby:", error);
+                    alert("Could not create lobby.");
+                }
+            };
+
+            // Trigger file input
             importFileInput.click();
         });
+
+        joinLobbyBtn.addEventListener('click', () => {
+            if (!currentUser) { alert("Not authenticated. Please wait a moment."); return; }
+            const lobbyId = joinCodeInput.value.toUpperCase();
+            if (!lobbyId) { alert("Please enter a lobby code."); return; }
+            joinLobby(lobbyId);
+        });
+        
+        async function joinLobby(lobbyId) {
+            if (!currentUser) return;
+            const lobbyRef = firebase.doc(db, 'lobbies', lobbyId);
+            const lobbySnap = await firebase.getDoc(lobbyRef);
+
+            if (!lobbySnap.exists()) {
+                alert("Lobby not found!");
+                return;
+            }
+
+            const playersColRef = firebase.collection(db, 'lobbies', lobbyId, 'players');
+            const playerDocRef = firebase.doc(playersColRef, currentUser.uid);
+
+            await firebase.setDoc(playerDocRef, {
+                username: `Player${Math.floor(Math.random() * 1000)}`,
+                x: player.x,
+                y: player.y,
+                height: player.height,
+                width: player.width,
+                color: player.color,
+                velocityX: 0,
+                velocityY: 0,
+                hasHook: false,
+            });
+
+            currentLobbyId = lobbyId;
+            enterLobbyScreen(lobbyId, lobbySnap.data());
+        }
+
+        function enterLobbyScreen(lobbyId, lobbyData) {
+            multiplayerMenu.style.display = 'none';
+            lobbyScreen.style.display = 'flex';
+            lobbyCodeDisplay.textContent = lobbyId;
+
+            if (lobbyData.ownerId === currentUser.uid) {
+                startGameBtn.style.display = 'block';
+            }
+
+            // Listen for lobby state changes
+            unsubscribeLobby = firebase.onSnapshot(firebase.doc(db, 'lobbies', lobbyId), (docSnap) => {
+                const data = docSnap.data();
+                if (data && data.gameState === 'playing') {
+                    const levelData = JSON.parse(data.levelData);
+                    loadLevelData(levelData, true);
+                    startGame(true, true); // Start in multiplayer mode
+                }
+            });
+            
+            // Listen for player list changes
+            const playersQuery = firebase.collection(db, 'lobbies', lobbyId, 'players');
+            unsubscribePlayers = firebase.onSnapshot(playersQuery, (querySnapshot) => {
+                const playerSlots = document.querySelectorAll('.player-slot');
+                playerSlots.forEach(slot => {
+                    slot.textContent = 'Empty';
+                    slot.classList.remove('filled');
+                });
+                
+                otherPlayers = {}; // Reset other players
+                let i = 0;
+                querySnapshot.forEach(doc => {
+                    const playerData = doc.data();
+                    if (playerSlots[i]) {
+                        playerSlots[i].textContent = playerData.username;
+                        playerSlots[i].classList.add('filled');
+                    }
+                    if (doc.id !== currentUser.uid) {
+                        otherPlayers[doc.id] = playerData;
+                    }
+                    i++;
+                });
+            });
+
+            // Listen for chat messages
+            const chatQuery = firebase.query(firebase.collection(db, 'lobbies', lobbyId, 'chat'), firebase.orderBy('timestamp', 'asc'));
+            unsubscribeChat = firebase.onSnapshot(chatQuery, (querySnapshot) => {
+                chatMessages.innerHTML = '';
+                querySnapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const msgEl = document.createElement('div');
+                    msgEl.innerHTML = `<b>${msg.senderName || 'User'}:</b> ${msg.text}`;
+                    chatMessages.appendChild(msgEl);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+        
+        setUsernameBtn.addEventListener('click', async () => {
+            const newUsername = usernameInput.value.trim();
+            if (newUsername && currentLobbyId && currentUser) {
+                const playerDocRef = firebase.doc(db, 'lobbies', currentLobbyId, 'players', currentUser.uid);
+                await firebase.updateDoc(playerDocRef, { username: newUsername });
+                player.username = newUsername;
+            }
+        });
+
+        chatInputForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (message && currentLobbyId && currentUser) {
+                const chatColRef = firebase.collection(db, 'lobbies', currentLobbyId, 'chat');
+                await firebase.addDoc(chatColRef, {
+                    senderId: currentUser.uid,
+                    senderName: player.username,
+                    text: message,
+                    timestamp: firebase.serverTimestamp()
+                });
+                chatInput.value = '';
+            }
+        });
+
+        startGameBtn.addEventListener('click', async () => {
+            if (currentLobbyId) {
+                const lobbyRef = firebase.doc(db, 'lobbies', currentLobbyId);
+                await firebase.updateDoc(lobbyRef, { gameState: 'playing' });
+            }
+        });
+        
+        async function leaveLobby() {
+            if (unsubscribeLobby) unsubscribeLobby();
+            if (unsubscribePlayers) unsubscribePlayers();
+            if (unsubscribeChat) unsubscribeChat();
+
+            if (currentLobbyId && currentUser) {
+                const playerDocRef = firebase.doc(db, 'lobbies', currentLobbyId, 'players', currentUser.uid);
+                await firebase.deleteDoc(playerDocRef);
+            }
+            
+            currentLobbyId = null;
+            otherPlayers = {};
+            lobbyScreen.style.display = 'none';
+            multiplayerMenu.style.display = 'flex';
+        }
+
+        leaveLobbyBtn.addEventListener('click', leaveLobby);
 
         controlsDisplay.innerHTML = `
             <ul>
@@ -2108,11 +2640,9 @@
 
         saveState();
         resetPlayer();
+        initFirebase();
         update();
     </script>
 </body>
 </html>
-
-
-
 
