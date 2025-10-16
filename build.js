@@ -14,3 +14,10 @@ export const firebaseConfig = {
 
 fs.writeFileSync("./firebaseConfig.js", config);
 console.log("✅ Firebase config built successfully!");
+
+if (!window.firebaseReady) {
+  alert("Not authenticated yet! Please wait a moment.");
+  return;
+}
+
+
