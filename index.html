@@ -577,7 +577,7 @@ const firebaseConfig = {
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
-
+        
         // Make auth and db globally accessible for the main script
         window.firebase = { auth, db, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, collection, doc, setDoc, getDoc, addDoc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, orderBy, signInWithCustomToken };
     </script>
@@ -2642,7 +2642,17 @@ const firebaseConfig = {
         resetPlayer();
         initFirebase();
         update();
+
+
     </script>
+
+    <!-- Load Firebase first -->
+  <script type="module" src="./firebase-init.js"></script>
+
+  <!-- Then your main game scripts (if you have them) -->
+  <script src="main.js"></script>
+  <script src="otherStuff.js"></script>
+  
 </body>
 </html>
 
