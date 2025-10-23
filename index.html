@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative 2D Platformer & Level Editor</title>
+    <title>V.I.C.E.2D.PLATFORMER</title>
     <style>
         * {
             margin: 0;
@@ -18,27 +18,87 @@
             min-height: 100vh;
             background-color: #f0f2f5;
             font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; /* Mencegah scroll */
         }
-        #main-menu, #multiplayer-menu {
+
+        /* --- STYLE PRELOADER & INTRO --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #ff4500; 
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 199;
+            color: white;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        .intro-line {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            position: absolute;
+        }
+        #intro-line-2 {
+            font-size: 0.7em;
+            margin-top: 60px;
+            color: #ccc;
+        }
+
+        /* --- STYLE MENU UTAMA & SUBMENU --- */
+        .fullscreen-menu {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: #f0f2f5;
-            display: flex;
+            display: none; /* Default tersembunyi */
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             z-index: 100;
             gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
         }
-        #main-menu h1, #multiplayer-menu h1 {
+        #main-menu {
+            display: none; /* Diatur oleh JS */
+        }
+        #main-menu h1 {
             font-size: 3em;
             color: #333;
         }
-        #main-menu p, #multiplayer-menu p {
+        #main-menu p {
             font-size: 1.2em;
             color: #555;
             margin-bottom: 20px;
@@ -57,8 +117,102 @@
             border: 2px solid #555;
             border-radius: 5px;
         }
-        #editor-wrapper, #controls-container, #multiplayer-menu, #lobby-screen {
-            display: none; /* Hidden by default, shown by JS */
+        
+        /* --- STYLE KONTROL & KUSTOMISASI KULIT BARU --- */
+        #controls-screen h2 {
+            font-size: 2em;
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        #controls-list {
+            text-align: left;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            border: 1px solid #ddd;
+        }
+        #controls-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        #controls-list li {
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+        #controls-list b {
+            display: inline-block;
+            width: 150px;
+            color: #ff4500;
+        }
+        #controls-screen h3 {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+        #controls-screen .tips {
+            font-size: 1.1em;
+            color: #444;
+            max-width: 500px;
+            margin-top: 10px;
+        }
+
+        #skin-customizer h2 {
+            font-size: 2em;
+            color: #333;
+        }
+        #skin-editor-area {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #skin-canvas {
+            width: 300px; /* 10x10 piksel, diperbesar */
+            height: 300px;
+            border: 2px solid #555;
+            background-color: #777;
+            image-rendering: pixelated; /* Membuat piksel tetap tajam */
+            cursor: crosshair;
+        }
+        #skin-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        #skin-tools label {
+            font-size: 1.1em;
+        }
+        #skin-tools input[type="file"] {
+            display: none;
+        }
+        .skin-tool-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #skin-load-label {
+             padding: 10px 15px;
+            font-size: 1em;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+            border: 2px solid #555;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.2s, color 0.2s;
+        }
+         #skin-load-label:hover {
+            background-color: #333;
+            color: #fff;
+         }
+
+
+        /* --- STYLE UI GAME & EDITOR --- */
+        #editor-wrapper, #controls-container {
+            display: none; /* Default tersembunyi */
         }
         #editor-wrapper {
             flex-direction: row;
@@ -76,7 +230,7 @@
             height: 100%;
             object-fit: cover;
             z-index: -1;
-            display: none !important; /* Make sure it's always hidden */
+            display: none !important; 
         }
         #gameCanvas {
             border: 2px solid #555;
@@ -92,7 +246,23 @@
             color: white;
             font-size: 24px;
             text-shadow: 2px 2px 4px black;
-            display: none; /* Hidden by default */
+            display: none; /* Default tersembunyi */
+        }
+        /* Tampilan Corndog BARU */
+        #corndog-display {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            color: white;
+            font-size: 20px;
+            text-shadow: 2px 2px 4px black;
+            display: none; /* Default tersembunyi */
+            align-items: center;
+            gap: 5px;
+        }
+        #corndog-display img {
+            width: 20px;
+            height: 20px;
         }
         #controls-display {
             position: absolute;
@@ -104,7 +274,7 @@
             border-radius: 8px;
             font-size: 14px;
             text-align: left;
-            display: none; /* Hidden by default */
+            display: none; /* Default tersembunyi */
             text-shadow: 1px 1px 2px black;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -148,6 +318,32 @@
             background-color: #333;
             color: #fff;
         }
+        button:disabled {
+            background-color: #ccc;
+            color: #888;
+            cursor: not-allowed;
+            border-color: #999;
+        }
+        
+        /* --- Tombol & Panel Editor BARU (Inventory, Settings) --- */
+        #editor-top-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+        #inventory-panel, #game-settings-panel {
+            display: none; /* Default tersembunyi */
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
         #editor-tools {
             display: flex;
             flex-wrap: wrap;
@@ -156,13 +352,15 @@
             justify-content: center;
             max-width: 800px;
         }
+        
+        /* Panel Settings Samping (untuk object, timeline) */
         #settings-panel, #timeline-settings-panel {
             width: 200px;
             background: #ffffff;
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 10px;
-            display: none; /* Hidden by default */
+            display: none; /* Default tersembunyi */
             flex-direction: column;
             gap: 8px;
             position: relative;
@@ -193,6 +391,8 @@
             padding-top: 10px;
             margin-top: 10px;
         }
+        
+        /* Konten Settings Game (dipindahkan) */
         #game-settings {
             display: flex;
             flex-direction: column;
@@ -221,6 +421,8 @@
             font-size: 0.8em;
             flex-basis: 45%;
          }
+         
+        /* --- Timeline & File --- */
         #timeline-header {
             display: flex;
             justify-content: center;
@@ -269,148 +471,105 @@
             gap: 10px;
             margin-top: 10px;
         }
-
-        /* Multiplayer & Lobby Styles */
-        #lobby-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #f0f2f5;
-            z-index: 101;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-        }
-        #lobby-info h2 {
-            margin-bottom: 10px;
-        }
-        #lobby-code {
-            background: #fff;
-            padding: 5px 10px;
-            border: 1px solid #333;
-            border-radius: 5px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-        #player-list {
-            list-style: none;
-            display: flex;
-            gap: 15px;
-        }
-        .player-slot {
-            width: 120px;
-            height: 50px;
-            border: 2px dashed #ccc;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #888;
-        }
-        .player-slot.filled {
-            border-style: solid;
-            border-color: #555;
-            color: #333;
-            font-weight: bold;
-        }
-        #chat-container {
-            width: 400px;
-            height: 200px;
-            border: 1px solid #ccc;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            border-radius: 5px;
-        }
-        #chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-        #chat-messages div {
-            margin-bottom: 5px;
-        }
-        #chat-messages b {
-            margin-right: 5px;
-        }
-        #chat-input-form {
-            display: flex;
-        }
-        #chat-input {
-            flex-grow: 1;
-            border: none;
-            border-top: 1px solid #ccc;
-            padding: 8px;
-            border-radius: 0 0 0 5px;
-        }
-        #chat-input-form button {
-             border-radius: 0 0 5px 0;
-        }
     </style>
 </head>
 <body>
-    <div id="main-menu">
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen">
+        <div id="intro-line-1" class="intro-line">I PRESENT TO Y'ALL</div>
+        <div id="intro-line-2" class="intro-line">CREATED BY MaAlFa123 (LOL)</div>
+    </div>
+
+    <!-- MENU UTAMA -->
+    <div id="main-menu" class="fullscreen-menu">
         <h1>Creative 2D Platformer</h1>
         <p>Create and play your own levels!</p>
         <div id="main-menu-buttons" class="menu-controls">
-            <button id="start-editor-btn">Create New Level</button>
+            <!-- Input Username BARU -->
+            <input type="text" id="username-input" placeholder="Enter Username" value="Player">
             <button id="play-btn">Play</button>
+            <!-- Tombol Kustomisasi Kulit BARU -->
+            <button id="customize-skin-btn">Customize Skin</button>
+            <!-- Tombol Kontrol BARU -->
+            <button id="controls-btn">Controls & Tips</button>
         </div>
         <div id="play-submenu" class="menu-controls" style="display: none;">
+            <!-- Tombol Dipisah BARU -->
+            <button id="play-solo-btn">Play Level (Solo)</button>
+            <button id="create-level-btn">Create Level</button>
             <button id="tutorial-btn">Tutorial</button>
-            <button id="fan-level-btn">Multiplayer</button>
+            <button id="fan-level-btn" disabled>Multiplayer (WIP)</button> 
             <button id="back-to-main-btn">Back</button>
         </div>
     </div>
-
-    <div id="multiplayer-menu">
-         <h1>Multiplayer</h1>
-         <div class="menu-controls">
-            <button id="create-lobby-btn">Create Lobby</button>
-            <input type="text" id="join-code-input" placeholder="Enter Lobby Code">
-            <button id="join-lobby-btn">Join Lobby</button>
-            <button id="back-to-play-menu-btn">Back</button>
-         </div>
+    
+    <!-- LAYAR KONTROL BARU -->
+    <div id="controls-screen" class="fullscreen-menu">
+        <h2>Controls & Tips</h2>
+        <div id="controls-list">
+             <ul>
+                <li><b>Move:</b> A / D</li>
+                <li><b>Jump:</b> Space</li>
+                <li><b>Wall Climb:</b> W (on wall)</li>
+                <li><b>Sprint:</b> Hold Shift + Move</li>
+                <li><b>Dash/Slide:</b> Sprint + S</li>
+                <li><b>Grapple:</b> E (Aim w/ mouse)</li>
+                <li><b>Set Checkpoint:</b> F (needs Corndog)</li>
+                <li><b>Toggle Editor:</b> Q (in Create Mode)</li>
+                <li><b>Undo:</b> Z (in Editor Mode)</li>
+            </ul>
+        </div>
+        <h3>Pro Tips!</h3>
+        <p class="tips">
+            Gunakan 'Coyote Time'! Anda masih bisa melompat sesaat setelah jatuh dari pijakan.
+            Gunakan lompatan dari dinding (wall-jump) dan grapple-swing untuk mencapai kecepatan tinggi!
+        </p>
+        <button id="back-to-main-from-controls-btn" style="margin-top: 30px;">Back</button>
+    </div>
+    
+    <!-- LAYAR KUSTOMISASI KULIT BARU -->
+    <div id="skin-customizer" class="fullscreen-menu">
+        <h2>Customize Your Skin</h2>
+        <div id="skin-editor-area">
+            <!-- Canvas 10x10, diperbesar oleh CSS -->
+            <canvas id="skin-canvas" width="10" height="10"></canvas>
+            <div id="skin-tools">
+                <div class="skin-tool-row">
+                    <label for="skin-color-picker">Draw Color:</label>
+                    <input type="color" id="skin-color-picker" value="#FFFFFF">
+                </div>
+                 <div class="skin-tool-row">
+                    <label for="skin-eraser-checkbox">Eraser:</label>
+                    <input type="checkbox" id="skin-eraser-checkbox">
+                </div>
+                <button id="skin-save-btn">Save Skin</button>
+                <input type="file" id="skin-load-input" accept="image/*">
+                <label for="skin-load-input" id="skin-load-label">Load Skin</label>
+            </div>
+        </div>
+        <button id="back-to-main-from-skin-btn" style="margin-top: 30px;">Back</button>
     </div>
 
-    <div id="lobby-screen">
-        <div id="lobby-info">
-            <h2>Lobby Code: <span id="lobby-code"></span></h2>
-        </div>
-        <h3>Players:</h3>
-        <ul id="player-list">
-            <li class="player-slot" id="player-slot-0">Empty</li>
-            <li class="player-slot" id="player-slot-1">Empty</li>
-            <li class="player-slot" id="player-slot-2">Empty</li>
-            <li class="player-slot" id="player-slot-3">Empty</li>
-        </ul>
-         <div class="menu-controls">
-            <input type="text" id="username-input" placeholder="Enter Username">
-            <button id="set-username-btn">Set Username</button>
-        </div>
-        <div id="chat-container">
-            <div id="chat-messages"></div>
-            <form id="chat-input-form">
-                <input type="text" id="chat-input" placeholder="Type a message...">
-                <button type="submit">Send</button>
-            </form>
-        </div>
-        <button id="start-game-btn" style="display:none;">Start Game</button>
-         <button id="leave-lobby-btn">Leave Lobby</button>
-    </div>
 
+    <!-- WRAPPER GAME & EDITOR -->
     <div id="editor-wrapper">
         <div id="game-container">
             <video id="background-video" loop muted playsinline></video>
             <canvas id="gameCanvas" width="800" height="600"></canvas>
             <div id="game-timer-display">0.00</div>
+            <!-- Tampilan Corndog BARU -->
+            <div id="corndog-display">
+                <img src="corndog.png" alt="Corndog Icon">
+                <span id="corndog-count">x 0</span>
+            </div>
             <div id="controls-display"></div>
         </div>
+        <!-- Panel Settings Samping (Object & Timeline) -->
         <div id="settings-panel">
             <button class="close-btn" id="close-settings-panel">X</button>
             <div id="object-settings-content">
@@ -482,60 +641,82 @@
             </div>
         </div>
     </div>
+    
+    <!-- Kontrol Editor (Bawah) -->
     <div id="controls-container">
         <div id="controls">Press 'Q' to toggle Editor, 'Z' to Undo</div>
-        <div id="editor-tools">
-            <button class="tool-btn active" data-type="select">Select</button>
-            <button class="tool-btn" data-type="platform">Platform</button>
-            <button class="tool-btn" data-type="spike">Spike</button>
-            <button class="tool-btn" data-type="button">Button</button>
-            <button class="tool-btn" data-type="decay">Decay Block</button>
-            <button class="tool-btn" data-type="delay">Delay Block</button>
-            <button class="tool-btn" data-type="text_block">Text Block</button>
-            <button class="tool-btn" data-type="music">Music</button>
-            <button class="tool-btn" data-type="grappler">Grappler</button>
-            <button class="tool-btn" data-type="spawn">Spawn</button>
-            <button class="tool-btn" data-type="laser_source">Laser</button>
-            <button class="tool-btn" data-type="end">End</button>
-            <button class="tool-btn" id="link-tool-btn" data-type="linker">Link</button>
+        
+        <!-- Tombol Inventory & Settings BARU -->
+        <div id="editor-top-buttons">
+            <button id="inventory-toggle-btn">Inventory</button>
+            <button id="settings-toggle-btn">Settings</button>
         </div>
-        <div id="game-settings">
-             <div class="settings-slider-row">
-                <label for="laser-speed-slider">Laser Speed:</label>
-                <input type="range" id="laser-speed-slider" min="0.5" max="10" step="0.1" value="1.5">
-            </div>
-             <div class="settings-slider-row">
-                <label for="platform-speed-slider">Platform Speed:</label>
-                <input type="range" id="platform-speed-slider" min="0.5" max="10" step="0.1" value="2">
-            </div>
-             <div class="settings-slider-row">
-                <label for="player-speed-slider">Player Speed:</label>
-                <input type="range" id="player-speed-slider" min="1" max="15" step="0.1" value="5">
-            </div>
-             <div class="settings-slider-row">
-                 <label for="player-accel-slider">Player Accel:</label>
-                <input type="range" id="player-accel-slider" min="0.1" max="2" step="0.05" value="0.4">
-            </div>
-             <div class="settings-slider-row">
-                <label for="player-jump-slider">Player Jump:</label>
-                <input type="range" id="player-jump-slider" min="5" max="25" step="0.5" value="13">
-            </div>
-             <div class="settings-slider-row">
-                <label for="background-color-picker">BG Color:</label>
-                <input type="color" id="background-color-picker" value="#000000">
-            </div>
-            <div class="background-controls">
-                <button id="set-background-image-btn">Set BG Image</button>
-                <input type="file" id="background-image-input" accept="image/*" style="display: none;">
-                <button id="set-background-video-btn">Set BG Video</button>
-                <input type="file" id="background-video-input" accept="video/*" style="display: none;">
-                <button id="clear-background-btn">Clear Background</button>
-            </div>
-            <div class="settings-slider-row">
-                <label for="hook-enabled-checkbox">Grappling Hook:</label>
-                <input type="checkbox" id="hook-enabled-checkbox">
+        
+        <!-- Panel Inventory BARU -->
+        <div id="inventory-panel">
+            <h3>Inventory</h3>
+            <div id="editor-tools">
+                <button class="tool-btn active" data-type="select">Select</button>
+                <button class="tool-btn" data-type="platform">Platform</button>
+                <button class="tool-btn" data-type="spike">Spike</button>
+                <button class="tool-btn" data-type="button">Button</button>
+                <button class="tool-btn" data-type="decay">Decay Block</button>
+                <button class="tool-btn" data-type="delay">Delay Block</button>
+                <button class="tool-btn" data-type="text_block">Text Block</button>
+                <button class="tool-btn" data-type="music">Music</button>
+                <button class="tool-btn" data-type="grappler">Grappler</button>
+                <!-- Tombol Corndog BARU -->
+                <button class="tool-btn" data-type="corndog">Corndog</button>
+                <button class="tool-btn" data-type="spawn">Spawn</button>
+                <button class="tool-btn" data-type="laser_source">Laser</button>
+                <button class="tool-btn" data-type="end">End</button>
+                <button class="tool-btn" id="link-tool-btn" data-type="linker">Link</button>
             </div>
         </div>
+        
+        <!-- Panel Settings Game BARU (dipindahkan ke sini) -->
+        <div id="game-settings-panel">
+            <h3>Game Settings</h3>
+            <div id="game-settings">
+                 <div class="settings-slider-row">
+                    <label for="laser-speed-slider">Laser Speed:</label>
+                    <input type="range" id="laser-speed-slider" min="0.5" max="10" step="0.1" value="1.5">
+                </div>
+                 <div class="settings-slider-row">
+                    <label for="platform-speed-slider">Platform Speed:</label>
+                    <input type="range" id="platform-speed-slider" min="0.5" max="10" step="0.1" value="2">
+                </div>
+                 <div class="settings-slider-row">
+                    <label for="player-speed-slider">Player Speed:</label>
+                    <input type="range" id="player-speed-slider" min="1" max="15" step="0.1" value="5">
+                </div>
+                 <div class="settings-slider-row">
+                     <label for="player-accel-slider">Player Accel:</label>
+                    <input type="range" id="player-accel-slider" min="0.1" max="2" step="0.05" value="0.4">
+                </div>
+                 <div class="settings-slider-row">
+                    <label for="player-jump-slider">Player Jump:</label>
+                    <input type="range" id="player-jump-slider" min="5" max="25" step="0.5" value="13">
+                </div>
+                 <div class="settings-slider-row">
+                    <label for="background-color-picker">BG Color:</label>
+                    <input type="color" id="background-color-picker" value="#000000">
+                </div>
+                <div class="background-controls">
+                    <button id="set-background-image-btn">Set BG Image</button>
+                    <input type="file" id="background-image-input" accept="image/*" style="display: none;">
+                    <button id="set-background-video-btn">Set BG Video</button>
+                    <input type="file" id="background-video-input" accept="video/*" style="display: none;">
+                    <button id="clear-background-btn">Clear Background</button>
+                </div>
+                <div class="settings-slider-row">
+                    <label for="hook-enabled-checkbox">Grappling Hook:</label>
+                    <input type="checkbox" id="hook-enabled-checkbox">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timeline & File Controls (tetap) -->
         <div id="timeline-container">
             <div id="timeline-header">
                 <label>Timeline:</label>
@@ -551,56 +732,29 @@
         </div>
     </div>
     
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-        import { 
-            getFirestore, collection, doc, setDoc, getDoc, addDoc, onSnapshot, 
-            updateDoc, deleteDoc, serverTimestamp, query, orderBy 
-        } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-
-        // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "${FIREBASE_API_KEY}",
-  authDomain: "${FIREBASE_AUTH_DOMAIN}",
-  projectId: "${FIREBASE_PROJECT_ID}",
-  storageBucket: "${FIREBASE_STORAGE_BUCKET}",
-  messagingSenderId: "${FIREBASE_MESSAGING_SENDER_ID}",
-  appId: "${FIREBASE_APP_ID}",
-  measurementId: "${FIREBASE_MEASUREMENT_ID}"
-};
-
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-        
-        // Make auth and db globally accessible for the main script
-        window.firebase = { auth, db, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, collection, doc, setDoc, getDoc, addDoc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, orderBy, signInWithCustomToken };
-    </script>
-
     <script type="module">
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const backgroundVideo = document.getElementById('background-video');
         const gameTimerDisplay = document.getElementById('game-timer-display');
+        // Tampilan Corndog BARU
+        const corndogDisplay = document.getElementById('corndog-display');
+        const corndogCountSpan = document.getElementById('corndog-count');
+        
         const controlsDisplay = document.getElementById('controls-display');
         const timelineCanvas = document.getElementById('timeline-canvas');
         const timelineCtx = timelineCanvas.getContext('2d');
         const controlsText = document.getElementById('controls');
         const toolButtons = document.querySelectorAll('.tool-btn');
         
-        // Settings Panels
+        // Panel Settings Samping
         const settingsPanel = document.getElementById('settings-panel');
         const objectSettingsContent = document.getElementById('object-settings-content');
         const colorPicker = document.getElementById('color-picker');
         const rotateBtn = document.getElementById('rotate-btn');
         const transparentCheckbox = document.getElementById('transparent-checkbox');
         
-        // Text Block Settings
+        // Settings Text Block
         const textBlockSettingsDiv = document.getElementById('text-block-settings');
         const textContentInput = document.getElementById('text-content-input');
         const fontSizeInput = document.getElementById('font-size-input');
@@ -610,13 +764,13 @@ const firebaseConfig = {
         const textGlowSizeInput = document.getElementById('text-glow-size-input');
         const showOnTriggerCheckbox = document.getElementById('show-on-trigger-checkbox');
 
-        // Other Object Settings
+        // Settings Object Lain
         const buttonLaserSettingsDiv = document.getElementById('button-laser-settings');
         const laserDirectionSelect = document.getElementById('laser-direction-select');
         const musicBlockSettingsDiv = document.getElementById('music-block-settings');
         const musicBlockFileInput = document.getElementById('music-block-file');
         
-        // Game Settings
+        // Settings Game (Slider, dll)
         const laserSpeedSlider = document.getElementById('laser-speed-slider');
         const platformSpeedSlider = document.getElementById('platform-speed-slider');
         const playerSpeedSlider = document.getElementById('player-speed-slider');
@@ -624,7 +778,7 @@ const firebaseConfig = {
         const playerJumpSlider = document.getElementById('player-jump-slider');
         const hookEnabledCheckbox = document.getElementById('hook-enabled-checkbox');
         
-        // Background Settings
+        // Settings Background
         const backgroundColorPicker = document.getElementById('background-color-picker');
         const setBackgroundImageBtn = document.getElementById('set-background-image-btn');
         const backgroundImageInput = document.getElementById('background-image-input');
@@ -645,52 +799,52 @@ const firebaseConfig = {
         const closeSettingsPanelBtn = document.getElementById('close-settings-panel');
         const closeTimelinePanelBtn = document.getElementById('close-timeline-panel');
         
-        // File I/O
+        // Kontrol File
         const saveButton = document.getElementById('saveButton');
         const loadButton = document.getElementById('loadButton');
         const importFileInput = document.getElementById('import-file-input');
         
-        // Main Menu
+        // Menu Utama & Submenu
         const mainMenu = document.getElementById('main-menu');
         const mainMenuButtons = document.getElementById('main-menu-buttons');
         const playSubMenu = document.getElementById('play-submenu');
-        const startEditorBtn = document.getElementById('start-editor-btn');
+        const createLevelBtn = document.getElementById('create-level-btn'); // Ganti nama dari soloBtn
+        const playSoloBtn = document.getElementById('play-solo-btn'); // Tombol BARU
         const playBtn = document.getElementById('play-btn');
         const tutorialBtn = document.getElementById('tutorial-btn');
-        const fanLevelBtn = document.getElementById('fan-level-btn');
         const backToMainBtn = document.getElementById('back-to-main-btn');
-
-        // Multiplayer UI
-        const multiplayerMenu = document.getElementById('multiplayer-menu');
-        const createLobbyBtn = document.getElementById('create-lobby-btn');
-        const joinLobbyBtn = document.getElementById('join-lobby-btn');
-        const joinCodeInput = document.getElementById('join-code-input');
-        const backToPlayMenuBtn = document.getElementById('back-to-play-menu-btn');
-        
-        // Lobby UI
-        const lobbyScreen = document.getElementById('lobby-screen');
-        const lobbyCodeDisplay = document.getElementById('lobby-code');
-        const playerList = document.getElementById('player-list');
+        // Input Username BARU
         const usernameInput = document.getElementById('username-input');
-        const setUsernameBtn = document.getElementById('set-username-btn');
-        const chatContainer = document.getElementById('chat-container');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInputForm = document.getElementById('chat-input-form');
-        const chatInput = document.getElementById('chat-input');
-        const startGameBtn = document.getElementById('start-game-btn');
-        const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
- 
-        // --- FIREBASE & MULTIPLAYER STATE ---
-        let auth, db;
-        let currentUser = null;
-        let currentLobbyId = null;
-        let unsubscribeLobby = null;
-        let unsubscribePlayers = null;
-        let unsubscribeChat = null;
-        let otherPlayers = {};
+
+        // Tombol & Layar BARU
+        const controlsBtn = document.getElementById('controls-btn');
+        const controlsScreen = document.getElementById('controls-screen');
+        const backToMainFromControlsBtn = document.getElementById('back-to-main-from-controls-btn');
+        const customizeSkinBtn = document.getElementById('customize-skin-btn');
+        const skinCustomizer = document.getElementById('skin-customizer');
+        const backToMainFromSkinBtn = document.getElementById('back-to-main-from-skin-btn');
         
+        // Kontrol Editor BARU
+        const inventoryToggleBtn = document.getElementById('inventory-toggle-btn');
+        const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+        const inventoryPanel = document.getElementById('inventory-panel');
+        const gameSettingsPanel = document.getElementById('game-settings-panel');
+        
+        // Kustomisasi Kulit BARU
+        const skinCanvas = document.getElementById('skin-canvas');
+        const skinCtx = skinCanvas.getContext('2d');
+        const skinColorPicker = document.getElementById('skin-color-picker');
+        const skinEraserCheckbox = document.getElementById('skin-eraser-checkbox');
+        const skinSaveBtn = document.getElementById('skin-save-btn');
+        const skinLoadInput = document.getElementById('skin-load-input');
+        let playerSkinImage = new Image();
+        let playerSkinDataUrl = null;
+        let isDrawingSkin = false;
+
+        // --- STATE GAME ---
         let editorMode = false;
         let isPlayOnlyMode = false;
+        let loadMode = 'editor'; // BARU: 'editor' atau 'play'
         const gridSize = 20;
         const editorCameraSpeed = 10;
         const TIMELINE_MAX_SECONDS = 300;
@@ -717,13 +871,23 @@ const firebaseConfig = {
         const worldHeight = 20000;
         const gravity = 0.6;
         const MAX_JUMPS = 2;
-        const JUMP_BUFFER_FRAMES = 8; 
+        const JUMP_BUFFER_FRAMES = 8;
+        // Coyote Time BARU
+        const COYOTE_TIME_FRAMES = 6; // 100ms @ 60fps
+        
         const DELAY_BLOCK_FADE_TIME = 300; 
+
+        // State Corndog BARU
+        let corndogImage = new Image();
+        corndogImage.src = 'corndog.png'; // Pastikan file ini ada
+        let corndogCount = 0;
+        let checkpointPosition = null;
 
         let history = [];
         let historyIndex = -1;
 
         function saveState() {
+            // ... (fungsi saveState tidak berubah) ...
             if (historyIndex < history.length - 1) {
                 history = history.slice(0, historyIndex + 1);
             }
@@ -733,6 +897,7 @@ const firebaseConfig = {
         }
 
         function undo() {
+            // ... (fungsi undo tidak berubah) ...
             if (historyIndex > 0) {
                 historyIndex--;
                 const previousState = JSON.parse(history[historyIndex]);
@@ -758,11 +923,11 @@ const firebaseConfig = {
             jumpsMade: 0, color: '#FFFFFF', acceleration: 0.4, friction: 0.3,
             maxSpeed: 5, isWallHolding: false, 
             wallClimbAcceleration: 0.2, maxWallClimbSpeed: 2.5, wallClimbFriction: 0.3,
-            coyoteTimeCounter: 0, coyoteTimeDuration: 30,
+            coyoteTimeCounter: 0, // Diperbarui
             wallDirection: 0, isCrouching: false, isDashing: false, 
             dashSpeed: 0, dashFriction: 0.2, isSprinting: false, 
             sprintMultiplier: 1.6,
-            hasHook: false, // Player starts without the hook power-up
+            hasHook: false, 
             username: 'Player'
         };
 
@@ -784,6 +949,7 @@ const firebaseConfig = {
         };
         
         let hookState = {
+            // ... (state hook tidak berubah) ...
             isFiring: false,
             isHooked: false,
             x: 0, y: 0,
@@ -796,28 +962,30 @@ const firebaseConfig = {
         };
 
         const camera = { x: 0, y: 0 };
-        const keys = { w: false, a: false, s: false, d: false, shift: false, space: false };
+        const keys = { w: false, a: false, s: false, d: false, shift: false, space: false, f: false }; // 'f' ditambahkan
         let jumpBufferCounter = 0;
 
         function applySettingsToPlayer() {
+            // ... (fungsi applySettingsToPlayer tidak berubah) ...
             player.maxSpeed = levelSettings.playerMaxSpeed;
             player.acceleration = levelSettings.playerAcceleration;
             player.jumpPower = levelSettings.playerJumpPower;
         }
 
         function checkRectCollision(objA, objB) {
+            // ... (fungsi checkRectCollision tidak berubah) ...
             return objA.x < objB.x + objB.width && objA.x + objA.width > objB.x && objA.y < objB.y + objB.height && objA.y + objA.height > objB.y;
         }
         
+        // ... (fungsi sign & isPointInTriangle tidak berubah) ...
         function sign(p1, p2, p3) { return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y); }
-
         function isPointInTriangle(pt, v1, v2, v3) {
             const d1 = sign(pt, v1, v2), d2 = sign(pt, v2, v3), d3 = sign(pt, v3, v1);
             const has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0), has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
             return !(has_neg && has_pos);
         }
-
         function checkPlayerSpikeCollision(player, spike) {
+            // ... (fungsi checkPlayerSpikeCollision tidak berubah) ...
             if (!checkRectCollision(player, spike)) return false; 
             const playerCorners = [ { x: player.x, y: player.y }, { x: player.x + player.width, y: player.y }, { x: player.x, y: player.y + player.height }, { x: player.x + player.width, y: player.y + player.height }, ];
             let v1, v2, v3;
@@ -832,7 +1000,7 @@ const firebaseConfig = {
         function resetPlayer() {
             gameWon = false;
             gameTime = 0;
-            player.hasHook = false; // Reset hook power-up
+            player.hasHook = false; 
             applySettingsToPlayer();
             detachHook();
             
@@ -841,6 +1009,17 @@ const firebaseConfig = {
                 audio.currentTime = 0;
             });
 
+            // Logika Checkpoint BARU
+            let spawnPoint = levelObjects.find(obj => obj.type === 'spawn');
+            const startPos = checkpointPosition || (spawnPoint ? {x: spawnPoint.x, y: spawnPoint.y} : playerStart);
+            
+            // Jika kita menggunakan checkpoint, hapus benderanya
+            if (checkpointPosition) {
+                levelObjects = levelObjects.filter(obj => obj.type !== 'flag');
+                checkpointPosition = null; // Checkpoint hanya sekali pakai
+            }
+
+            // Reset semua object level
             levelObjects.forEach(obj => { 
                 if(obj.movePath) { obj.x = obj.movePath.start.x; obj.y = obj.movePath.start.y; obj.moveDirection = 1; }
                 if(obj.type === 'button') obj.activated = false;
@@ -850,33 +1029,43 @@ const firebaseConfig = {
                     clearTimeout(obj.activationTimeout);
                     obj.isActive = false;
                 }
-                // Reset triggered and collected states
                 if(obj.type === 'grappler') { obj.visible = false; obj.collected = false; }
-                if(obj.type === 'text_block' && obj.showOnTrigger) { obj.visible = false; }
+                // Reset Corndog BARU - DIHAPUS DARI SINI
+                // if(obj.type === 'corndog') { obj.collected = false; }
             });
-            let spawnPoint = levelObjects.find(obj => obj.type === 'spawn');
-            const startPos = spawnPoint ? {x: spawnPoint.x, y: spawnPoint.y} : playerStart;
+            
+            // corndogCount = 0; // Reset corndog count - DIHAPUS DARI SINI
+            updateCorndogDisplay();
+            
             Object.assign(player, { x: startPos.x, y: startPos.y, velocityX: 0, velocityY: 0, jumpsMade: 0, isDashing: false, isWallHolding: false, coyoteTimeCounter: 0, isCrouching: false, height: player.originalHeight });
 
-            // Instantly snap camera to the new player position
+            // Snap kamera instan
             camera.x = player.x - canvas.width / 2 + player.width / 2;
             camera.y = player.y - canvas.height / 2 + player.height / 2;
         }
 
         function canStandUp() {
+            // ... (fungsi canStandUp tidak berubah) ...
             const standHitbox = { x: player.x, y: player.y - player.originalHeight / 2, width: player.width, height: player.originalHeight };
             return !levelObjects.some(obj => obj.isSolid && obj.type === 'platform' && checkRectCollision(standHitbox, obj));
         }
         
         function keyDownHandler(e) {
             const key = e.key.toLowerCase();
+            
+            // Cek jika fokus ada di input teks
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+                return; // Jangan proses hotkey jika sedang mengetik
+            }
+            
             if (key === 'z' && editorMode) {
                 undo();
                 return;
             }
-            if (key === 'q' && !isPlayOnlyMode && !currentLobbyId) {
+            if (key === 'q' && !isPlayOnlyMode) { 
                 editorMode = !editorMode;
                 gameTimerDisplay.style.display = editorMode ? 'none' : 'block';
+                corndogDisplay.style.display = editorMode ? 'none' : 'flex'; // Tampilkan corndog
                 controlsDisplay.style.display = editorMode ? 'none' : 'block';
                 controlsText.textContent = editorMode ? "EDITOR MODE [W,A,S,D to Pan | Q to Toggle]" : "PLAY MODE";
                 if (!editorMode) { 
@@ -893,17 +1082,28 @@ const firebaseConfig = {
             else if (key === 'a') keys.a = true;
             else if (key === 's') keys.s = true;
             else if (key === 'shift') keys.shift = true;
-            else if (key === 'w') keys.w = true; // For climbing / hook reeling
+            else if (key === 'w') keys.w = true; // Untuk memanjat / grapple
+            else if (key === 'f') keys.f = true; // Kunci Corndog BARU
             else if (key === ' ') {
                 e.preventDefault();
                 keys.space = true;
                 jumpBufferCounter = JUMP_BUFFER_FRAMES;
+                
+                // --- LOGIKA JUMP BARU (dgn Coyote Time & Wall Jump) ---
                 if (!e.repeat && !editorMode) {
-                    if (!player.isWallHolding && !hookState.isHooked && player.jumpsMade < MAX_JUMPS) {
+                    if (player.coyoteTimeCounter > 0 || (player.isWallHolding && !onGround)) { // Lompat dasar, coyote, atau lompat dinding
+                        player.velocityY = -player.jumpPower;
+                        player.jumpsMade = 1;
+                        jumpBufferCounter = 0;
+                        player.coyoteTimeCounter = 0;
+                        if (player.isWallHolding) {
+                            player.velocityX = -player.wallDirection * player.jumpPower * 0.75; // Dorongan dari dinding
+                            player.isWallHolding = false;
+                        }
+                    } else if (!player.isWallHolding && !hookState.isHooked && player.jumpsMade > 0 && player.jumpsMade < MAX_JUMPS) { // Double jump
                         player.velocityY = -player.jumpPower;
                         player.jumpsMade++;
                         jumpBufferCounter = 0;
-                        player.coyoteTimeCounter = 0;
                     }
                 }
             } else if (key === 'e' && !editorMode && levelSettings.hookEnabled && player.hasHook && !e.repeat) {
@@ -924,15 +1124,18 @@ const firebaseConfig = {
             else if (key === 'w') keys.w = false;
             else if (key === ' ') keys.space = false;
             else if (key === 'shift') keys.shift = false;
+            else if (key === 'f') keys.f = false; // Kunci Corndog BARU
         }
         
         function updateMousePos(e) {
+            // ... (fungsi updateMousePos tidak berubah) ...
             const rect = canvas.getBoundingClientRect();
             mouseX = e.clientX - rect.left + camera.x;
             mouseY = e.clientY - rect.top + camera.y;
         }
 
         function updateSettingsPanel() {
+            // ... (fungsi updateSettingsPanel hampir tidak berubah) ...
             const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
             
             textBlockSettingsDiv.style.display = 'none';
@@ -976,6 +1179,7 @@ const firebaseConfig = {
         }
         
         function updateTimelineSettingsPanel() {
+            // ... (fungsi updateTimelineSettingsPanel tidak berubah) ...
             const event = levelSettings.timelineEvents.find(ev => ev.id === selectedTimelineEventId);
             eventTextSettingsDiv.style.display = 'none';
             eventColorSettingsDiv.style.display = 'none';
@@ -1004,6 +1208,7 @@ const firebaseConfig = {
             const clickedObject = levelObjects.find(obj => mouseX >= obj.x && mouseX <= obj.x + obj.width && mouseY >= obj.y && mouseY <= obj.y + obj.height);
 
             if (linkingState.isLinking) {
+                // ... (logika linking tidak berubah) ...
                 if (!clickedObject) return;
                 if (clickedObject.type === 'button' && !linkingState.sourceButtonId) {
                     linkingState.sourceButtonId = clickedObject.id;
@@ -1022,6 +1227,7 @@ const firebaseConfig = {
             }
 
             if (e.button === 0) { // Left Click
+                // ... (logika mousedown tidak berubah) ...
                 if (currentBlockType === 'select') {
                     selectedObjectId = clickedObject ? clickedObject.id : null;
                     selectedTimelineEventId = null;
@@ -1050,13 +1256,15 @@ const firebaseConfig = {
         }
 
         function mouseUpHandler(e) {
+            // ... (fungsi mouseUpHandler hampir tidak berubah) ...
             if (!editorMode) return;
             if (pathCreationState.isCreating) { 
+                // ... (logika path creation tidak berubah) ...
                 const sourceObject = levelObjects.find(obj => obj.id === pathCreationState.sourceObjectId);
                 if (sourceObject) {
                     const dx = mouseX - (sourceObject.x + sourceObject.width / 2);
                     const dy = mouseY - (sourceObject.y + sourceObject.height / 2);
-                    if (dx*dx + dy*dy > 100) { // Only create path if dragged far enough
+                    if (dx*dx + dy*dy > 100) { 
                         sourceObject.movePath = { 
                             start: { x: sourceObject.x, y: sourceObject.y }, 
                             end: { x: mouseX - sourceObject.width / 2, y: mouseY - sourceObject.height / 2 } 
@@ -1103,6 +1311,13 @@ const firebaseConfig = {
                     newObject.color = '#9c27b0'; newObject.isSolid = false;
                     newObject.visible = false; newObject.collected = false;
                  }
+                 // Penambahan Corndog BARU
+                 if(newObject.type === 'corndog') {
+                    newObject.width = gridSize * 2; newObject.height = gridSize * 2;
+                    newObject.color = '#FFD700'; // Warna fallback jika gambar gagal
+                    newObject.isSolid = false;
+                    newObject.collected = false;
+                 }
                  if(newObject.type === 'text_block') {
                     newObject.content = "Text";
                     newObject.fontSize = 32;
@@ -1125,6 +1340,7 @@ const firebaseConfig = {
         }
 
         toolButtons.forEach(button => {
+            // ... (listener toolButtons tidak berubah) ...
             button.addEventListener('click', () => {
                 toolButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
@@ -1136,6 +1352,7 @@ const firebaseConfig = {
         });
         
         colorPicker.addEventListener('input', (e) => {
+            // ... (listener colorPicker tidak berubah) ...
             if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
                 if (selectedObject) { selectedObject.color = e.target.value; saveState(); }
@@ -1143,6 +1360,7 @@ const firebaseConfig = {
         });
 
         transparentCheckbox.addEventListener('change', (e) => {
+            // ... (listener transparentCheckbox tidak berubah) ...
             if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
                 if (selectedObject) { selectedObject.isSolid = !e.target.checked; saveState(); }
@@ -1151,6 +1369,7 @@ const firebaseConfig = {
         
         // --- TEXT BLOCK SETTINGS LISTENERS ---
         function updateSelectedTextBlock(prop, value) {
+             // ... (fungsi updateSelectedTextBlock tidak berubah) ...
              if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
                 if (selectedObject && selectedObject.type === 'text_block') {
@@ -1166,6 +1385,7 @@ const firebaseConfig = {
         textGlowColorPicker.addEventListener('input', (e) => updateSelectedTextBlock('glowColor', e.target.value));
         textGlowSizeInput.addEventListener('input', (e) => updateSelectedTextBlock('glowSize', parseInt(e.target.value, 10)));
         showOnTriggerCheckbox.addEventListener('change', (e) => {
+            // ... (listener showOnTriggerCheckbox tidak berubah) ...
             const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
             if (selectedObject && selectedObject.type === 'text_block') {
                 selectedObject.showOnTrigger = e.target.checked;
@@ -1177,6 +1397,7 @@ const firebaseConfig = {
         });
 
         laserDirectionSelect.addEventListener('change', (e) => {
+             // ... (listener laserDirectionSelect tidak berubah) ...
              if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
                 if (selectedObject && selectedObject.type === 'button') {
@@ -1187,6 +1408,7 @@ const firebaseConfig = {
         });
 
         musicBlockFileInput.addEventListener('change', (e) => {
+            // ... (listener musicBlockFileInput tidak berubah) ...
             if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
                 const file = e.target.files[0];
@@ -1207,6 +1429,7 @@ const firebaseConfig = {
         });
         
         rotateBtn.addEventListener('click', () => {
+             // ... (listener rotateBtn tidak berubah) ...
              if (selectedObjectId) {
                 const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
                 if (selectedObject) {
@@ -1222,6 +1445,7 @@ const firebaseConfig = {
             }
         });
         
+        // ... (listener slider settings game tidak berubah) ...
         laserSpeedSlider.addEventListener('input', (e) => { levelSettings.laserSpeed = parseFloat(e.target.value); });
         platformSpeedSlider.addEventListener('input', (e) => { levelSettings.platformSpeed = parseFloat(e.target.value); });
         playerSpeedSlider.addEventListener('input', (e) => { levelSettings.playerMaxSpeed = parseFloat(e.target.value); applySettingsToPlayer(); });
@@ -1252,13 +1476,15 @@ const firebaseConfig = {
         });
         
         function clearBackgroundMedia() {
+            // ... (fungsi clearBackgroundMedia tidak berubah) ...
             levelSettings.backgroundImageSrc = null;
             levelSettings.backgroundVideoSrc = null;
             levelBackgroundImage = null;
-            backgroundVideo.src = ''; // Just clear the src
+            backgroundVideo.src = ''; 
         }
 
         backgroundImageInput.addEventListener('change', (e) => {
+            // ... (listener backgroundImageInput tidak berubah) ...
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -1273,6 +1499,7 @@ const firebaseConfig = {
         });
         
         backgroundVideoInput.addEventListener('change', (e) => {
+            // ... (listener backgroundVideoInput tidak berubah) ...
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -1287,10 +1514,8 @@ const firebaseConfig = {
         });
 
         function loadBackgroundMedia() {
-            // Set canvas background color as a fallback
+            // ... (fungsi loadBackgroundMedia tidak berubah) ...
             canvas.style.backgroundColor = levelSettings.backgroundColor || '#000000';
-            
-            // Clear old media
             levelBackgroundImage = null;
             backgroundVideo.src = '';
             
@@ -1303,14 +1528,15 @@ const firebaseConfig = {
             }
         }
 
-
         hookEnabledCheckbox.addEventListener('change', (e) => {
+            // ... (listener hookEnabledCheckbox tidak berubah) ...
             if (editorMode) {
                 levelSettings.hookEnabled = e.target.checked;
                 saveState();
             }
         });
         
+        // ... (listener tombol event timeline tidak berubah) ...
         addTextEventBtn.addEventListener('click', () => {
             currentTimelineEventType = 'text';
             addTextEventBtn.classList.add('active');
@@ -1322,7 +1548,7 @@ const firebaseConfig = {
             addTextEventBtn.classList.remove('active');
         });
 
-
+        // ... (listener mouse timeline tidak berubah) ...
         timelineCanvas.addEventListener('mousedown', (e) => {
             if (!editorMode) return;
             const rect = timelineCanvas.getBoundingClientRect();
@@ -1369,7 +1595,6 @@ const firebaseConfig = {
             updateTimelineSettingsPanel();
             drawTimeline();
         });
-
         timelineCanvas.addEventListener('mousemove', (e) => {
             if (!editorMode || (!timelineDragState.isDragging && !timelineDragState.isResizing)) return;
             const rect = timelineCanvas.getBoundingClientRect();
@@ -1389,14 +1614,12 @@ const firebaseConfig = {
             }
             drawTimeline();
         });
-
         timelineCanvas.addEventListener('mouseup', () => {
             if (timelineDragState.isDragging || timelineDragState.isResizing) {
                 saveState();
             }
             timelineDragState = { isDragging: false, isResizing: null, targetId: null, offset: 0 };
         });
-
         timelineCanvas.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             if (!editorMode) return;
@@ -1425,6 +1648,7 @@ const firebaseConfig = {
             }
         });
         
+        // ... (listener input event timeline tidak berubah) ...
         eventTextContentInput.addEventListener('input', e => {
             const event = levelSettings.timelineEvents.find(ev => ev.id === selectedTimelineEventId);
             if(event) { event.text = e.target.value; saveState(); }
@@ -1453,7 +1677,6 @@ const firebaseConfig = {
             drawTimeline(); 
         });
 
-
         document.addEventListener('keydown', keyDownHandler);
         document.addEventListener('keyup', keyUpHandler);
         canvas.addEventListener('mousemove', updateMousePos);
@@ -1461,6 +1684,7 @@ const firebaseConfig = {
         canvas.addEventListener('mouseup', mouseUpHandler);
         canvas.addEventListener('contextmenu', e => e.preventDefault());
         
+        // ... (listener saveButton tidak berubah) ...
         saveButton.addEventListener('click', () => {
             const data = JSON.stringify({ objects: levelObjects, settings: levelSettings }, null, 2);
             const blob = new Blob([data], { type: 'application/json' });
@@ -1474,11 +1698,14 @@ const firebaseConfig = {
             URL.revokeObjectURL(url);
         });
 
+        // Load Button (di editor)
         loadButton.addEventListener('click', () => {
+            loadMode = 'editor'; // Set mode untuk load ke editor
             isPlayOnlyMode = false;
             importFileInput.click();
         });
 
+        // Listener Input File (untuk SEMUA mode load)
         importFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1487,12 +1714,10 @@ const firebaseConfig = {
             reader.onload = (event) => {
                 try {
                     const data = JSON.parse(event.target.result);
-                    // Check if we are in multiplayer lobby creation flow
-                    if (window.creatingLobby) {
-                        window.creatingLobby(data);
-                        window.creatingLobby = null; // Reset flow
-                    } else if (data.objects && data.settings) {
-                        loadLevelData(data, isPlayOnlyMode);
+                    if (data.objects && data.settings) {
+                        // Tentukan mode berdasarkan 'loadMode'
+                        const startInPlayOnly = (loadMode === 'play'); 
+                        loadLevelData(data, startInPlayOnly); // Muat data
                         alert('Level loaded successfully!');
                     } else {
                         alert('Invalid level file format.');
@@ -1510,6 +1735,7 @@ const firebaseConfig = {
             levelObjects = data.objects;
             levelSettings = data.settings;
             
+            // ... (sisa fungsi loadLevelData tidak berubah) ...
             if (levelSettings.hookEnabled === undefined) { levelSettings.hookEnabled = false; }
             if (levelSettings.backgroundVideoSrc === undefined) { levelSettings.backgroundVideoSrc = null; }
             if (levelSettings.backgroundImageSrc === undefined) { levelSettings.backgroundImageSrc = null; }
@@ -1539,62 +1765,52 @@ const firebaseConfig = {
             applySettingsToPlayer();
             saveState(); 
             drawTimeline();
-            startGame(playOnly);
+            startGame(playOnly); // Mulai game dengan mode yang benar
         }
         
+        // ... (fungsi fireHook, detachHook, updateHook tidak berubah) ...
         function fireHook() {
             hookState.isFiring = true;
             hookState.x = player.x + player.width / 2;
             hookState.y = player.y + player.height / 2;
-
             const dx = mouseX - hookState.x;
             const dy = mouseY - hookState.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-
             hookState.velocityX = (dx / dist) * hookState.speed;
             hookState.velocityY = (dy / dist) * hookState.speed;
-
             hookState.startX = hookState.x;
             hookState.startY = hookState.y;
         }
-
         function detachHook() {
             hookState.isHooked = false;
             hookState.isFiring = false;
             hookState.attachedObjectId = null;
-
             const speed = Math.sqrt(player.velocityX * player.velocityX + player.velocityY * player.velocityY);
-            
             if (speed > 10) {
                 player.velocityX *= 1.1;
                 player.velocityY *= 1.1;
             }
-            
             player.jumpsMade = 0;
         }
-
         function updateHook() {
             if (!hookState.isFiring) return;
-
             hookState.x += hookState.velocityX;
             hookState.y += hookState.velocityY;
-
             for (const obj of levelObjects) {
-                if (obj.isSolid && (obj.type === 'platform' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased)) &&
+                // DIPERBARUI: Hook sekarang bisa menempel di semua platform solid
+                if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') &&
                     hookState.x >= obj.x && hookState.x <= obj.x + obj.width &&
                     hookState.y >= obj.y && hookState.y <= obj.y + obj.height) {
                     
                     hookState.isFiring = false;
                     hookState.isHooked = true;
                     hookState.attachedObjectId = obj.id;
-                    
                     const dx = (player.x + player.width / 2) - hookState.x;
                     const dy = (player.y + player.height / 2) - hookState.y;
                     hookState.ropeLength = Math.sqrt(dx*dx + dy*dy);
                     return; 
                 }
             }
-
             const dxRange = hookState.x - hookState.startX;
             const dyRange = hookState.y - hookState.startY;
             const distTraveled = Math.sqrt(dxRange*dxRange + dyRange*dyRange);
@@ -1602,17 +1818,16 @@ const firebaseConfig = {
                 hookState.isFiring = false;
             }
         }
-        
-        function drawHook() {
-            if (!hookState.isFiring && !hookState.isHooked) return;
 
+        function drawHook() {
+            // ... (fungsi drawHook tidak berubah) ...
+            if (!hookState.isFiring && !hookState.isHooked) return;
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(player.x + player.width / 2, player.y + player.height / 2);
             ctx.lineTo(hookState.x, hookState.y);
             ctx.stroke();
-
             ctx.fillStyle = '#FFFFFF';
             ctx.beginPath();
             ctx.arc(hookState.x, hookState.y, 5, 0, 2 * Math.PI);
@@ -1621,7 +1836,7 @@ const firebaseConfig = {
 
         function drawLevelObjects() {
             levelObjects.forEach(obj => {
-                if (!editorMode && obj.isSolid === false && obj.type !== 'text_block' && obj.type !== 'grappler') { return; }
+                if (!editorMode && obj.isSolid === false && obj.type !== 'text_block' && obj.type !== 'grappler' && obj.type !== 'corndog' && obj.type !== 'flag') { return; }
                 let color = obj.color || '#999';
                 ctx.fillStyle = color;
                 ctx.globalAlpha = (editorMode && obj.isSolid === false) ? 0.5 : 1.0;
@@ -1630,6 +1845,7 @@ const firebaseConfig = {
                     case 'platform': case 'spawn': case 'laser_source': case 'end':
                         ctx.fillRect(obj.x, obj.y, obj.width, obj.height); break;
                     case 'music':
+                        // ... (draw music tidak berubah) ...
                         ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
                         ctx.fillStyle = 'white';
                         ctx.beginPath();
@@ -1639,11 +1855,11 @@ const firebaseConfig = {
                         ctx.fillRect(obj.x + obj.width * 0.4, obj.y + obj.height * 0.2, obj.width * 0.25, obj.height*0.1);
                         break;
                     case 'grappler':
+                        // ... (draw grappler tidak berubah) ...
                         if (editorMode || (obj.visible && !obj.collected)) {
                             ctx.globalAlpha = (editorMode && !obj.visible) ? 0.4 : 1.0;
                             ctx.fillStyle = obj.color;
                             ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                            // Draw hook icon inside
                             ctx.strokeStyle = 'white';
                             ctx.lineWidth = 3;
                             ctx.beginPath();
@@ -1654,16 +1870,34 @@ const firebaseConfig = {
                             ctx.stroke();
                         }
                         break;
+                    // Penambahan Corndog & Flag BARU
+                    case 'corndog':
+                        if (editorMode || !obj.collected) {
+                            ctx.globalAlpha = (editorMode && obj.collected) ? 0.4 : 1.0;
+                            if (corndogImage.complete && corndogImage.naturalHeight !== 0) {
+                                ctx.drawImage(corndogImage, obj.x, obj.y, obj.width, obj.height);
+                            } else {
+                                ctx.fillRect(obj.x, obj.y, obj.width, obj.height); // Fallback
+                            }
+                        }
+                        break;
+                    case 'flag':
+                        if (corndogImage.complete && corndogImage.naturalHeight !== 0) {
+                            ctx.drawImage(corndogImage, obj.x, obj.y, obj.width, obj.height);
+                        } else {
+                            ctx.fillStyle = '#FFA500'; // Fallback
+                            ctx.fillRect(obj.x, obj.y, obj.width, obj.height); 
+                        }
+                        break;
                     case 'text_block':
+                        // ... (draw text_block tidak berubah) ...
                         if(editorMode || (!obj.showOnTrigger || obj.visible)) {
-                            // Draw container in editor mode
                             if (editorMode) {
                                 ctx.fillStyle = obj.color || '#333333';
                                 ctx.globalAlpha = 0.5;
                                 ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
                                 ctx.globalAlpha = 1.0;
                             }
-                            // Draw text content
                             ctx.save();
                             ctx.font = `${obj.fontSize || 32}px ${obj.fontFamily || "'Courier New'"}`;
                             ctx.fillStyle = obj.textColor || '#FFFFFF';
@@ -1674,10 +1908,11 @@ const firebaseConfig = {
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             ctx.fillText(obj.content || '', obj.x + obj.width/2, obj.y + obj.height/2);
-                            ctx.restore(); // Resets shadow properties
+                            ctx.restore(); 
                         }
                         break;
                     case 'spike':
+                        // ... (draw spike tidak berubah) ...
                         ctx.beginPath();
                         let o = obj.orientation || 'up';
                         if (o === 'up') { ctx.moveTo(obj.x, obj.y + obj.height); ctx.lineTo(obj.x + obj.width / 2, obj.y); ctx.lineTo(obj.x + obj.width, obj.y + obj.height); } 
@@ -1698,6 +1933,7 @@ const firebaseConfig = {
         }
         
         function drawChasingLaser() {
+            // ... (fungsi drawChasingLaser tidak berubah) ...
             levelObjects.forEach(laserSource => {
                 if (laserSource.type === 'laser_source' && laserSource.isActive) {
                     ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
@@ -1713,6 +1949,7 @@ const firebaseConfig = {
         }
 
         function drawSelectionArrows(obj) {
+            // ... (fungsi drawSelectionArrows tidak berubah) ...
             ctx.fillStyle = 'yellow';
             const size = 10;
             ctx.beginPath(); ctx.moveTo(obj.x + obj.width / 2, obj.y - size); ctx.lineTo(obj.x + obj.width / 2 - size / 2, obj.y); ctx.lineTo(obj.x + obj.width / 2 + size / 2, obj.y); ctx.closePath(); ctx.fill();
@@ -1722,6 +1959,7 @@ const firebaseConfig = {
         }
 
         function drawEditorElements() {
+            // ... (fungsi drawEditorElements tidak berubah) ...
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; ctx.lineWidth = 1;
             for (let x = 0; x < worldWidth; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, worldHeight); ctx.stroke(); }
             for (let y = 0; y < worldHeight; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(worldWidth, y); ctx.stroke(); }
@@ -1784,22 +2022,29 @@ const firebaseConfig = {
         }
         
         function drawPlayer(p_object, isLocalPlayer) {
-             // Main body
-            ctx.fillStyle = p_object.color || '#FFFFFF';
-            ctx.fillRect(p_object.x, p_object.y, p_object.width, p_object.height);
+            // Logika Skin Kustom BARU
+            if (isLocalPlayer && playerSkinDataUrl && playerSkinImage.complete && playerSkinImage.naturalHeight !== 0) {
+                ctx.imageSmoothingEnabled = false; // Jaga piksel tetap tajam
+                ctx.drawImage(playerSkinImage, p_object.x, p_object.y, p_object.width, p_object.height);
+                ctx.imageSmoothingEnabled = true;
+            } else {
+                // Gambar default
+                ctx.fillStyle = p_object.color || '#FFFFFF';
+                ctx.fillRect(p_object.x, p_object.y, p_object.width, p_object.height);
 
-            // Black outline
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(p_object.x, p_object.y, p_object.width, p_object.height);
-            
-            // Orange Plus Sign only for local player
-            if (isLocalPlayer) {
-                ctx.fillStyle = '#FFA500';
-                const crossWidth = p_object.width * 0.2;
-                const crossLength = p_object.width * 0.6;
-                ctx.fillRect(p_object.x + (p_object.width - crossLength) / 2, p_object.y + (p_object.height - crossWidth) / 2, crossLength, crossWidth);
-                ctx.fillRect(p_object.x + (p_object.width - crossWidth) / 2, p_object.y + (p_object.height - crossLength) / 2, crossWidth, crossLength);
+                // Outline hitam
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p_object.x, p_object.y, p_object.width, p_object.height);
+                
+                // Tanda plus oranye hanya untuk pemain lokal
+                if (isLocalPlayer) {
+                    ctx.fillStyle = '#FFA500';
+                    const crossWidth = p_object.width * 0.2;
+                    const crossLength = p_object.width * 0.6;
+                    ctx.fillRect(p_object.x + (p_object.width - crossLength) / 2, p_object.y + (p_object.height - crossWidth) / 2, crossLength, crossWidth);
+                    ctx.fillRect(p_object.x + (p_object.width - crossWidth) / 2, p_object.y + (p_object.height - crossLength) / 2, crossWidth, crossLength);
+                }
             }
 
             // Username
@@ -1810,7 +2055,7 @@ const firebaseConfig = {
                 ctx.fillText(p_object.username, p_object.x + p_object.width / 2, p_object.y - 10);
             }
             
-            // Hook indicator
+            // Indikator hook
             if (isLocalPlayer && p_object.hasHook && !hookState.isFiring && !hookState.isHooked) {
                 const iconX = p_object.x + p_object.width + 5;
                 const iconY = p_object.y + p_object.height / 2;
@@ -1827,6 +2072,7 @@ const firebaseConfig = {
         }
 
         function drawWinMessage() {
+            // ... (fungsi drawWinMessage tidak berubah) ...
             ctx.fillStyle = 'white';
             ctx.font = '60px "Courier New"';
             ctx.textAlign = 'center';
@@ -1834,6 +2080,7 @@ const firebaseConfig = {
         }
         
         function drawActiveTextEvents() {
+            // ... (fungsi drawActiveTextEvents tidak berubah) ...
             const activeTextEvents = levelSettings.timelineEvents.filter(event => 
                 event.type === 'text' && gameTime >= event.startTime && gameTime < event.startTime + event.duration);
 
@@ -1845,6 +2092,7 @@ const firebaseConfig = {
             });
         }
         
+        // ... (fungsi lerpColor & updateBackgroundColor tidak berubah) ...
         function lerpColor(a, b, amount) { 
             const ar = a >> 16, ag = a >> 8 & 0xff, ab = a & 0xff,
                   br = b >> 16, bg = b >> 8 & 0xff, bb = b & 0xff,
@@ -1853,9 +2101,8 @@ const firebaseConfig = {
                   rb = ab + amount * (bb - ab);
             return (rr << 16 | rg << 8 | rb | 0).toString(16).padStart(6, '0');
         };
-
         function updateBackgroundColor() {
-            if (levelSettings.backgroundImageSrc || levelSettings.backgroundVideoSrc) return; // Don't run if media background is set
+            if (levelSettings.backgroundImageSrc || levelSettings.backgroundVideoSrc) return; 
 
             const colorEvents = levelSettings.timelineEvents.filter(e => e.type === 'background_color').sort((a,b) => a.startTime - b.startTime);
             let currentEvent = null;
@@ -1885,6 +2132,7 @@ const firebaseConfig = {
         }
 
         function drawTimeline() {
+            // ... (fungsi drawTimeline tidak berubah) ...
             timelineCtx.clearRect(0, 0, timelineCanvas.width, timelineCanvas.height);
             timelineCtx.fillStyle = '#ddd';
             timelineCtx.fillRect(0, 0, timelineCanvas.width, timelineCanvas.height);
@@ -1908,29 +2156,17 @@ const firebaseConfig = {
             }
         }
         
-        async function updatePlayerStateInFirestore() {
-            if (!currentLobbyId || !currentUser) return;
-            const playerDocRef = firebase.doc(db, 'lobbies', currentLobbyId, 'players', currentUser.uid);
-            await firebase.updateDoc(playerDocRef, {
-                x: player.x,
-                y: player.y,
-                height: player.height,
-                width: player.width,
-                velocityX: player.velocityX,
-                velocityY: player.velocityY,
-                hasHook: player.hasHook
-            });
-        }
-        
         let lastUpdateTime = 0;
-        const updateInterval = 1000 / 15; // 15 times per second
+        const updateInterval = 1000 / 15; 
+        
+        let onGround = false; // Variabel global untuk onGround
 
         function update() {
             const now = performance.now();
             
             if (!editorMode) {
                 if(gameWon) {
-                    // Game is won, no updates
+                    // Game dimenangkan
                 } else {
                     gameTime += 1 / 60;
                     gameTimerDisplay.textContent = gameTime.toFixed(2);
@@ -1940,16 +2176,12 @@ const firebaseConfig = {
                         updateHook();
                     }
                     
-                    if (now - lastUpdateTime > updateInterval && currentLobbyId) {
-                        updatePlayerStateInFirestore();
-                        lastUpdateTime = now;
-                    }
-
                     const isPlayerHooked = hookState.isHooked;
                     const hookedPlatformId = hookState.attachedObjectId;
 
-                    // --- LASER LOGIC: ALWAYS MOVES ---
+                    // --- LOGIKA LASER ---
                     levelObjects.forEach(laserSource => {
+                        // ... (logika laser tidak berubah) ...
                         if(laserSource.type === 'laser_source' && laserSource.isActive) {
                             let o = laserSource.orientation || 'left';
                             if(o === 'left' || o === 'up') laserSource.position += levelSettings.laserSpeed;
@@ -1965,11 +2197,12 @@ const firebaseConfig = {
                     });
 
 
-                    // --- MOVING PLATFORM LOGIC ---
+                    // --- LOGIKA PLATFORM BERGERAK ---
                     levelObjects.forEach(obj => {
+                        // ... (logika platform bergerak tidak berubah) ...
                         if (obj.movePath) {
                             if (isPlayerHooked && obj.id !== hookedPlatformId) {
-                                return; // This stops other platforms from moving.
+                                return; 
                             }
 
                             const target = obj.moveDirection === 1 ? obj.movePath.end : obj.movePath.start;
@@ -2003,7 +2236,8 @@ const firebaseConfig = {
                     });
                     
                     if (isPlayerHooked) {
-                        // --- SWINGING PHYSICS ---
+                        // --- FISIKA SWINGING ---
+                        // ... (logika swing tidak berubah) ...
                         if (keys.d) player.velocityX += 0.2;
                         if (keys.a) player.velocityX -= 0.2;
                         
@@ -2014,7 +2248,6 @@ const firebaseConfig = {
                         player.velocityY += gravity;
                         player.x += player.velocityX;
 
-                        // --- ROBUST: Horizontal Collision detection during swing ---
                         levelObjects.forEach(obj => {
                             if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
                                 if (player.velocityX > 0 && player.x - player.velocityX + player.width <= obj.x + 1) {
@@ -2029,7 +2262,6 @@ const firebaseConfig = {
 
                         player.y += player.velocityY;
 
-                        // --- ROBUST: Vertical Collision detection during swing ---
                         levelObjects.forEach(obj => {
                             if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
                                 if (player.velocityY > 0 && player.y - player.velocityY + player.height <= obj.y + 1) {
@@ -2042,7 +2274,7 @@ const firebaseConfig = {
                             }
                         });
 
-                        player.velocityX *= 0.995; // Air friction
+                        player.velocityX *= 0.995; 
 
                         const playerCenterX = player.x + player.width / 2;
                         const playerCenterY = player.y + player.height / 2;
@@ -2065,11 +2297,12 @@ const firebaseConfig = {
                         }
 
                     } else {
-                        // --- NORMAL PLATFORMING PHYSICS ---
-                        let onGround = false;
+                        // --- FISIKA PLATFORMING NORMAL ---
+                        onGround = false; // Reset di setiap frame
                         
                         const touchingHitbox = { x: player.x - 1, y: player.y - 1, width: player.width + 2, height: player.height + 2 };
                         levelObjects.forEach(obj => {
+                            // ... (logika delay block tidak berubah) ...
                             if (obj.type === 'delay') {
                                 if (!obj.isFading && obj.isSolid && checkRectCollision(touchingHitbox, obj)) {
                                     obj.isFading = true;
@@ -2086,6 +2319,7 @@ const firebaseConfig = {
                         let wallTouchDirection = 0;
                         
                         if (player.isWallHolding) {
+                            // ... (logika wall holding tidak berubah) ...
                             let isStillNextToWall = false;
                             const checkRect = { x: player.x + (player.wallDirection === 1 ? player.width : -1), y: player.y, width: 1, height: player.height };
                             for (const obj of levelObjects) {
@@ -2097,7 +2331,7 @@ const firebaseConfig = {
                                 player.isWallHolding = false;
                             } else {
                                 player.velocityX = 0;
-                                if (keys.w) { // W FOR CLIMBING
+                                if (keys.w) { 
                                     player.velocityY -= player.wallClimbAcceleration;
                                     if (player.velocityY < -player.maxWallClimbSpeed) player.velocityY = -player.maxWallClimbSpeed;
                                 } else if (keys.s) {
@@ -2115,7 +2349,6 @@ const firebaseConfig = {
                                 const isPressingAway = (keys.a && player.wallDirection === 1) || (keys.d && player.wallDirection === -1);
                                 if (isPressingAway) {
                                     player.isWallHolding = false; 
-                                    player.coyoteTimeCounter = player.coyoteTimeDuration; 
                                     player.jumpsMade = 1;
                                 }
                             }
@@ -2132,10 +2365,14 @@ const firebaseConfig = {
                                     else if (player.velocityX < 0) { player.velocityX = Math.min(0, player.velocityX + player.friction); }
                                 }
                             }
-                            if (player.coyoteTimeCounter > 0) { player.coyoteTimeCounter--; player.velocityY = gravity * 0.5; } 
-                            else { player.velocityY += gravity; }
+                            
+                            // Logika Coyote Time DITERAPKAN
+                            if (player.coyoteTimeCounter <= 0) { 
+                                player.velocityY += gravity; 
+                            }
                         }
                         
+                        // ... (logika crouch & dash tidak berubah) ...
                         const touchingGround = levelObjects.some(obj => obj.isSolid && (obj.type === 'platform' || (obj.type === 'delay' && !obj.phased)) && checkRectCollision({x:player.x, y:player.y+1, width: player.width, height:player.height}, obj));
                         if (keys.s && !player.isWallHolding && touchingGround) { 
                             if (player.isSprinting && !player.isDashing) {
@@ -2160,6 +2397,7 @@ const firebaseConfig = {
                             player.velocityX = player.dashSpeed * Math.sign(player.velocityX);
                         }
 
+                        // --- Horizontal Collision ---
                         player.x += player.velocityX;
                         levelObjects.forEach(obj => {
                             if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
@@ -2169,25 +2407,48 @@ const firebaseConfig = {
                             }
                         });
 
+                        // --- Vertical Collision ---
                         player.y += player.velocityY;
-                        
-                        onGround = false;
                         levelObjects.forEach(obj => {
                             if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
                                 if (player.isWallHolding && player.velocityY < 0 && (player.y + player.height <= obj.y + Math.abs(player.wallClimbAcceleration * (keys.w ? -1 : 1)))) {
                                     player.y = obj.y - player.height; onGround = true; player.isWallHolding = false;
-                                } else if (player.velocityY >= 0 && player.y - player.velocityY + player.height <= obj.y + 1) {
+                                } else if (player.velocityY >= 0 && player.y - player.velocityY + player.height <= obj.y + 1) { // Mendarat
                                     player.y = obj.y - player.height; player.velocityY = 0; onGround = true; 
-                                    player.isWallHolding = false; player.jumpsMade = 0; player.coyoteTimeCounter = 0;
-                                    if (jumpBufferCounter > 0) {
-                                        player.velocityY = -player.jumpPower; player.jumpsMade = 1; jumpBufferCounter = 0;
-                                    }
-                                } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) {
+                                    player.isWallHolding = false; 
+                                    // (Reset jumps/coyote ditangani di bawah)
+                                } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) { // Bentur kepala
                                     player.y = obj.y + obj.height; player.velocityY = 0;
                                 }
                             }
                         });
+                        
+                        // --- Logika Status Setelah Tumbukan ---
+                        if (onGround) {
+                            player.jumpsMade = 0;
+                            player.coyoteTimeCounter = COYOTE_TIME_FRAMES;
+                            if (jumpBufferCounter > 0) { // Lompat buffer
+                                player.velocityY = -player.jumpPower; 
+                                player.jumpsMade = 1; 
+                                jumpBufferCounter = 0;
+                                player.coyoteTimeCounter = 0;
+                            }
+                        } else {
+                            if (player.coyoteTimeCounter > 0) {
+                                player.coyoteTimeCounter--;
+                            }
+                            // Cek wall jump buffer
+                            if (jumpBufferCounter > 0 && player.isWallHolding) {
+                                player.isWallHolding = false;
+                                player.velocityY = -player.jumpPower;
+                                player.velocityX = -player.wallDirection * player.jumpPower * 0.75; 
+                                player.jumpsMade = 1;
+                                jumpBufferCounter = 0;
+                            }
+                        }
 
+
+                        // --- Interaksi Objek ---
                         levelObjects.forEach(obj => {
                             if (obj.isSolid && obj.type === 'spike' && checkPlayerSpikeCollision(player, obj)) { resetPlayer(); } 
                             else if (checkRectCollision(player, obj)) {
@@ -2195,7 +2456,14 @@ const firebaseConfig = {
                                     player.hasHook = true;
                                     obj.collected = true;
                                 }
+                                // Koleksi Corndog BARU
+                                if (obj.type === 'corndog' && !obj.collected) {
+                                    obj.collected = true;
+                                    corndogCount++;
+                                    updateCorndogDisplay();
+                                }
                                 if (obj.type === 'button' && !obj.activated) {
+                                    // ... (logika tombol tidak berubah) ...
                                     obj.activated = true;
                                     if (obj.linkedTo) {
                                         obj.linkedTo.forEach(targetId => {
@@ -2235,10 +2503,30 @@ const firebaseConfig = {
                             }
                         });
                         
+                        // Menanam Checkpoint Corndog BARU
+                        if (keys.f && corndogCount > 0 && onGround) {
+                            corndogCount--;
+                            updateCorndogDisplay();
+                            checkpointPosition = { x: player.x, y: player.y };
+                            // Hapus bendera lama
+                            levelObjects = levelObjects.filter(obj => obj.type !== 'flag');
+                            // Tambah bendera baru
+                            levelObjects.push({ 
+                                id: Date.now(), 
+                                type: 'flag', 
+                                x: player.x, 
+                                y: player.y, 
+                                width: 40, // Sesuaikan ukuran
+                                height: 40, // Sesuaikan ukuran
+                                isSolid: false 
+                            });
+                            keys.f = false; // Hindari penanaman berulang
+                        }
+                        
                         if (!player.isWallHolding && !onGround && wallTouchDirection !== 0) {
                             player.isWallHolding = true;
                             player.wallDirection = wallTouchDirection;
-                            player.jumpsMade = 0;
+                            player.jumpsMade = 1; // Wall grab dihitung sbg lompatan pertama
                             player.coyoteTimeCounter = 0;
                             player.velocityY = 0;
                         }
@@ -2251,12 +2539,12 @@ const firebaseConfig = {
                         resetPlayer();
                     }
                 }
-            } else { // editorMode is true
+            } else { // editorMode true
                 if (keys.d) camera.x += editorCameraSpeed; if (keys.a) camera.x -= editorCameraSpeed;
                 if (keys.s) camera.y += editorCameraSpeed; if (keys.w) camera.y -= editorCameraSpeed;
             }
 
-            // --- CAMERA AND DRAWING ---
+            // --- KAMERA DAN GAMBAR ---
             let targetCameraX = editorMode ? camera.x : player.x - canvas.width / 2 + player.width / 2;
             let targetCameraY = editorMode ? camera.y : player.y - canvas.height / 2 + player.height / 2;
 
@@ -2273,7 +2561,7 @@ const firebaseConfig = {
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw background video/image directly to canvas in SCREEN space
+            // ... (logika gambar background tidak berubah) ...
             if (levelSettings.backgroundVideoSrc && !backgroundVideo.paused && backgroundVideo.readyState >= 3) {
                 const ar = backgroundVideo.videoWidth / backgroundVideo.videoHeight;
                 const cr = canvas.width / canvas.height;
@@ -2303,11 +2591,6 @@ const firebaseConfig = {
                 drawChasingLaser();
             }
             
-            // Draw other players
-            for (const uid in otherPlayers) {
-                drawPlayer(otherPlayers[uid], false);
-            }
-
             if (levelSettings.hookEnabled) {
                 drawHook();
             }
@@ -2330,36 +2613,50 @@ const firebaseConfig = {
             requestAnimationFrame(update);
         }
 
-        function startGame(playOnly = false, isMultiplayer = false) {
+        // Fungsi Tampilan Corndog BARU
+        function updateCorndogDisplay() {
+            corndogCountSpan.textContent = `x ${corndogCount}`;
+        }
+
+        function startGame(playOnly = false) { 
             isPlayOnlyMode = playOnly;
             editorMode = !playOnly;
             
             mainMenu.style.display = 'none';
-            multiplayerMenu.style.display = 'none';
-            lobbyScreen.style.display = 'none';
             document.getElementById('editor-wrapper').style.display = 'flex';
             
             const controlsContainer = document.getElementById('controls-container');
-            if (playOnly && !isMultiplayer) {
+            if (playOnly) {
                 controlsContainer.style.display = 'none';
                 gameTimerDisplay.style.display = 'block';
+                corndogDisplay.style.display = 'flex'; // Tampilkan corndog
                 controlsDisplay.style.display = 'block';
-            } else if (!playOnly) { // Editor mode
+            } else { // Mode Editor
                 controlsContainer.style.display = 'flex';
                 controlsText.textContent = "EDITOR MODE [W,A,S,D to Pan | Q to Toggle]";
                 gameTimerDisplay.style.display = 'none';
+                corndogDisplay.style.display = 'none'; // Sembunyikan corndog
                 controlsDisplay.style.display = 'none';
+                // Reset panel editor
+                inventoryPanel.style.display = 'none';
+                gameSettingsPanel.style.display = 'none';
+                inventoryToggleBtn.classList.remove('active');
+                settingsToggleBtn.classList.remove('active');
             }
-
-            if (isMultiplayer) {
-                controlsContainer.style.display = 'none';
-                gameTimerDisplay.style.display = 'block';
-                controlsDisplay.style.display = 'block';
-            }
-
+            
+            // Reset corndog hanya saat level dimulai, bukan saat mati
+            levelObjects.forEach(obj => {
+                if(obj.type === 'corndog') {
+                    obj.collected = false;
+                }
+            });
+            corndogCount = 0;
+            updateCorndogDisplay();
+            
             resetPlayer();
         }
         
+        // ... (level tutorial tidak berubah) ...
         const tutorialLevel = {
             settings: {
                 laserSpeed: 1.5, playerMaxSpeed: 5, playerAcceleration: 0.4, playerJumpPower: 13,
@@ -2383,11 +2680,7 @@ const firebaseConfig = {
             ]
         };
 
-        // --- Event Listeners Initialization ---
-        
-        startEditorBtn.addEventListener('click', () => {
-            startGame(false);
-        });
+        // --- Event Listeners Inisialisasi ---
         
         playBtn.addEventListener('click', () => {
             mainMenuButtons.style.display = 'none';
@@ -2400,238 +2693,155 @@ const firebaseConfig = {
         });
 
         tutorialBtn.addEventListener('click', () => {
-            loadLevelData(tutorialLevel, true);
+            loadLevelData(tutorialLevel, true); // Selalu mode main
         });
         
-        // --- MULTIPLAYER MENU LOGIC ---
-        fanLevelBtn.addEventListener('click', () => {
-            playSubMenu.style.display = 'none';
-            multiplayerMenu.style.display = 'flex';
-        });
-
-        backToPlayMenuBtn.addEventListener('click', () => {
-            multiplayerMenu.style.display = 'none';
-            playSubMenu.style.display = 'flex';
+        // Tombol Create & Play Solo BARU
+        createLevelBtn.addEventListener('click', () => {
+            loadMode = 'editor';
+            startGame(false); // Mulai dalam mode editor
         });
         
-        // --- FIREBASE LOGIC ---
-        function initFirebase() {
-            auth = window.firebase.auth;
-            db = window.firebase.db;
-
-            window.firebase.onAuthStateChanged(auth, user => {
-                if (user) {
-                    currentUser = user;
-                    console.log("Authenticated user:", user.uid);
-                } else {
-                    // No user is signed in. Attempt to sign in.
-                    const signIn = async () => {
-                        try {
-                            // The environment provides a token for seamless authentication
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await window.firebase.signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                // Fallback for local development or other environments
-                                await window.firebase.signInAnonymously(auth);
-                            }
-                        } catch (error) {
-                            console.error("Authentication failed:", error);
-                            // Disable multiplayer if authentication fails completely
-                            const multiplayerBtn = document.getElementById('fan-level-btn');
-                            multiplayerBtn.disabled = true;
-                            multiplayerBtn.title = "Authentication failed, multiplayer is unavailable.";
-                            multiplayerBtn.style.cursor = 'not-allowed';
-                            multiplayerBtn.style.backgroundColor = '#ccc';
-                        }
-                    };
-                    signIn();
-                }
-            });
-        }
-        
-        // Generate a simple 4-char lobby code
-        function generateLobbyCode() {
-            return Math.random().toString(36).substring(2, 6).toUpperCase();
-        }
-
-        createLobbyBtn.addEventListener('click', () => {
-            if (!currentUser) {
-                alert("Not authenticated. Please wait a moment.");
-                return;
-            }
-            // Temporarily store a function to be called after file is loaded
-            window.creatingLobby = async (levelData) => {
-                const lobbyId = generateLobbyCode();
-                const lobbyRef = firebase.doc(db, 'lobbies', lobbyId);
-                
-                try {
-                    await firebase.setDoc(lobbyRef, {
-                        ownerId: currentUser.uid,
-                        levelData: JSON.stringify(levelData),
-                        gameState: 'waiting',
-                        createdAt: firebase.serverTimestamp()
-                    });
-                    await joinLobby(lobbyId);
-                } catch (error) {
-                    console.error("Error creating lobby:", error);
-                    alert("Could not create lobby.");
-                }
-            };
-
-            // Trigger file input
-            importFileInput.click();
-        });
-
-        joinLobbyBtn.addEventListener('click', () => {
-            if (!currentUser) { alert("Not authenticated. Please wait a moment."); return; }
-            const lobbyId = joinCodeInput.value.toUpperCase();
-            if (!lobbyId) { alert("Please enter a lobby code."); return; }
-            joinLobby(lobbyId);
+        playSoloBtn.addEventListener('click', () => {
+            loadMode = 'play'; // Set mode untuk load ke play
+            importFileInput.click(); // Minta pengguna memilih file JSON
         });
         
-        async function joinLobby(lobbyId) {
-            if (!currentUser) return;
-            const lobbyRef = firebase.doc(db, 'lobbies', lobbyId);
-            const lobbySnap = await firebase.getDoc(lobbyRef);
+        // Tombol Menu Kontrol BARU
+        controlsBtn.addEventListener('click', () => {
+            mainMenu.style.display = 'none';
+            controlsScreen.style.display = 'flex';
+        });
+        backToMainFromControlsBtn.addEventListener('click', () => {
+            controlsScreen.style.display = 'none';
+            mainMenu.style.display = 'flex';
+        });
 
-            if (!lobbySnap.exists()) {
-                alert("Lobby not found!");
-                return;
-            }
-
-            const playersColRef = firebase.collection(db, 'lobbies', lobbyId, 'players');
-            const playerDocRef = firebase.doc(playersColRef, currentUser.uid);
-
-            await firebase.setDoc(playerDocRef, {
-                username: `Player${Math.floor(Math.random() * 1000)}`,
-                x: player.x,
-                y: player.y,
-                height: player.height,
-                width: player.width,
-                color: player.color,
-                velocityX: 0,
-                velocityY: 0,
-                hasHook: false,
-            });
-
-            currentLobbyId = lobbyId;
-            enterLobbyScreen(lobbyId, lobbySnap.data());
-        }
-
-        function enterLobbyScreen(lobbyId, lobbyData) {
-            multiplayerMenu.style.display = 'none';
-            lobbyScreen.style.display = 'flex';
-            lobbyCodeDisplay.textContent = lobbyId;
-
-            if (lobbyData.ownerId === currentUser.uid) {
-                startGameBtn.style.display = 'block';
-            }
-
-            // Listen for lobby state changes
-            unsubscribeLobby = firebase.onSnapshot(firebase.doc(db, 'lobbies', lobbyId), (docSnap) => {
-                const data = docSnap.data();
-                if (data && data.gameState === 'playing') {
-                    const levelData = JSON.parse(data.levelData);
-                    loadLevelData(levelData, true);
-                    startGame(true, true); // Start in multiplayer mode
-                }
-            });
-            
-            // Listen for player list changes
-            const playersQuery = firebase.collection(db, 'lobbies', lobbyId, 'players');
-            unsubscribePlayers = firebase.onSnapshot(playersQuery, (querySnapshot) => {
-                const playerSlots = document.querySelectorAll('.player-slot');
-                playerSlots.forEach(slot => {
-                    slot.textContent = 'Empty';
-                    slot.classList.remove('filled');
-                });
-                
-                otherPlayers = {}; // Reset other players
-                let i = 0;
-                querySnapshot.forEach(doc => {
-                    const playerData = doc.data();
-                    if (playerSlots[i]) {
-                        playerSlots[i].textContent = playerData.username;
-                        playerSlots[i].classList.add('filled');
-                    }
-                    if (doc.id !== currentUser.uid) {
-                        otherPlayers[doc.id] = playerData;
-                    }
-                    i++;
-                });
-            });
-
-            // Listen for chat messages
-            const chatQuery = firebase.query(firebase.collection(db, 'lobbies', lobbyId, 'chat'), firebase.orderBy('timestamp', 'asc'));
-            unsubscribeChat = firebase.onSnapshot(chatQuery, (querySnapshot) => {
-                chatMessages.innerHTML = '';
-                querySnapshot.forEach(doc => {
-                    const msg = doc.data();
-                    const msgEl = document.createElement('div');
-                    msgEl.innerHTML = `<b>${msg.senderName || 'User'}:</b> ${msg.text}`;
-                    chatMessages.appendChild(msgEl);
-                });
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            });
-        }
+        // Tombol Menu Skin BARU
+        customizeSkinBtn.addEventListener('click', () => {
+            mainMenu.style.display = 'none';
+            skinCustomizer.style.display = 'flex';
+            drawSkinCanvas(); // Gambar skin saat ini
+        });
+        backToMainFromSkinBtn.addEventListener('click', () => {
+            skinCustomizer.style.display = 'none';
+            mainMenu.style.display = 'flex';
+        });
         
-        setUsernameBtn.addEventListener('click', async () => {
-            const newUsername = usernameInput.value.trim();
-            if (newUsername && currentLobbyId && currentUser) {
-                const playerDocRef = firebase.doc(db, 'lobbies', currentLobbyId, 'players', currentUser.uid);
-                await firebase.updateDoc(playerDocRef, { username: newUsername });
+        // Listener Input Username BARU
+        usernameInput.addEventListener('change', (e) => {
+            const newUsername = e.target.value.trim();
+            if (newUsername) {
                 player.username = newUsername;
-            }
-        });
-
-        chatInputForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = chatInput.value.trim();
-            if (message && currentLobbyId && currentUser) {
-                const chatColRef = firebase.collection(db, 'lobbies', currentLobbyId, 'chat');
-                await firebase.addDoc(chatColRef, {
-                    senderId: currentUser.uid,
-                    senderName: player.username,
-                    text: message,
-                    timestamp: firebase.serverTimestamp()
-                });
-                chatInput.value = '';
-            }
-        });
-
-        startGameBtn.addEventListener('click', async () => {
-            if (currentLobbyId) {
-                const lobbyRef = firebase.doc(db, 'lobbies', currentLobbyId);
-                await firebase.updateDoc(lobbyRef, { gameState: 'playing' });
+                usernameInput.value = newUsername; // Set value in case of trim
+                
+                // Juga simpan ke localStorage
+                try {
+                    localStorage.setItem('playerUsername', newUsername);
+                } catch (err) {
+                    console.error("Failed to save username", err);
+                }
+            } else {
+                // Jangan izinkan username kosong, kembalikan
+                usernameInput.value = player.username;
             }
         });
         
-        async function leaveLobby() {
-            if (unsubscribeLobby) unsubscribeLobby();
-            if (unsubscribePlayers) unsubscribePlayers();
-            if (unsubscribeChat) unsubscribeChat();
+        // Tombol Toggle Editor BARU
+        inventoryToggleBtn.addEventListener('click', () => {
+            const show = inventoryPanel.style.display === 'none';
+            inventoryPanel.style.display = show ? 'flex' : 'none';
+            inventoryToggleBtn.classList.toggle('active', show);
+        });
+        settingsToggleBtn.addEventListener('click', () => {
+            const show = gameSettingsPanel.style.display === 'none';
+            gameSettingsPanel.style.display = show ? 'flex' : 'none';
+            settingsToggleBtn.classList.toggle('active', show);
+        });
 
-            if (currentLobbyId && currentUser) {
-                const playerDocRef = firebase.doc(db, 'lobbies', currentLobbyId, 'players', currentUser.uid);
-                await firebase.deleteDoc(playerDocRef);
+        // --- Logika Kustomisasi Kulit BARU ---
+        
+        function drawSkinCanvas() {
+            skinCtx.fillStyle = '#777'; // Latar belakang grid
+            skinCtx.fillRect(0, 0, 10, 10);
+            if (playerSkinDataUrl) {
+                skinCtx.imageSmoothingEnabled = false;
+                skinCtx.drawImage(playerSkinImage, 0, 0, 10, 10);
+                skinCtx.imageSmoothingEnabled = true;
             }
-            
-            currentLobbyId = null;
-            otherPlayers = {};
-            lobbyScreen.style.display = 'none';
-            multiplayerMenu.style.display = 'flex';
+        }
+        
+        function getSkinCanvasMousePos(e) {
+            const rect = skinCanvas.getBoundingClientRect();
+            const scaleX = skinCanvas.width / rect.width;
+            const scaleY = skinCanvas.height / rect.height;
+            return {
+                x: Math.floor((e.clientX - rect.left) * scaleX),
+                y: Math.floor((e.clientY - rect.top) * scaleY)
+            };
         }
 
-        leaveLobbyBtn.addEventListener('click', leaveLobby);
+        function drawOnSkin(e) {
+            if (!isDrawingSkin) return;
+            const pos = getSkinCanvasMousePos(e);
+            if (pos.x < 0 || pos.x >= 10 || pos.y < 0 || pos.y >= 10) return;
+
+            if (skinEraserCheckbox.checked) {
+                skinCtx.clearRect(pos.x, pos.y, 1, 1);
+            } else {
+                skinCtx.fillStyle = skinColorPicker.value;
+                skinCtx.fillRect(pos.x, pos.y, 1, 1);
+            }
+        }
+        
+        skinCanvas.addEventListener('mousedown', (e) => {
+            isDrawingSkin = true;
+            drawOnSkin(e);
+        });
+        skinCanvas.addEventListener('mousemove', drawOnSkin);
+        skinCanvas.addEventListener('mouseup', () => isDrawingSkin = false);
+        skinCanvas.addEventListener('mouseleave', () => isDrawingSkin = false);
+        
+        skinSaveBtn.addEventListener('click', () => {
+            playerSkinDataUrl = skinCanvas.toDataURL();
+            playerSkinImage.src = playerSkinDataUrl;
+            
+            // Simpan Skin ke LocalStorage BARU
+            try {
+                localStorage.setItem('playerCustomSkin', playerSkinDataUrl);
+                alert('Skin saved!');
+            } catch (e) {
+                console.error("Failed to save skin to localStorage", e);
+                alert('Skin saved for this session, but could not save permanently.');
+            }
+        });
+        
+        skinLoadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    playerSkinDataUrl = event.target.result;
+                    playerSkinImage.src = playerSkinDataUrl;
+                    playerSkinImage.onload = () => {
+                        drawSkinCanvas();
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // --- Inisialisasi Akhir ---
 
         controlsDisplay.innerHTML = `
             <ul>
                 <li><b>Move:</b> A / D</li>
                 <li><b>Jump:</b> Space</li>
                 <li><b>Wall Climb:</b> W (on wall)</li>
-                <li><b>Sprint:</b> Hold Shift + Move</li>
+                <li><b>Sprint:</b> Hold Shift</li>
                 <li><b>Dash/Slide:</b> Sprint + S</li>
-                <li><b>Grapple:</b> E (Aim w/ mouse)</li>
+                <li><b>Grapple:</b> E</li>
+                <li><b>Set Flag:</b> F</li>
             </ul>
         `;
 
@@ -2640,19 +2850,70 @@ const firebaseConfig = {
 
         saveState();
         resetPlayer();
-        initFirebase();
-        update();
+        
+        // --- LOGIKA PRELOADER & INTRO ---
+        window.onload = () => {
+            const preloader = document.getElementById('preloader');
+            const introScreen = document.getElementById('intro-screen');
+            const introLine1 = document.getElementById('intro-line-1');
+            const introLine2 = document.getElementById('intro-line-2');
+            const mainMenu = document.getElementById('main-menu');
 
+            // 1. Tampilkan preloader (sudah diatur)
+            
+            // 2. Simulasikan loading
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                introScreen.style.display = 'flex';
 
+                // 3. Intro baris 1
+                setTimeout(() => {
+                    introLine1.style.opacity = '1';
+                }, 500); 
+
+                // 4. Intro baris 2
+                setTimeout(() => {
+                    introLine1.style.opacity = '0';
+                    introLine2.style.opacity = '1';
+                }, 2500); 
+
+                // 5. Tampilkan menu utama
+                setTimeout(() => {
+                    introScreen.style.display = 'none';
+                    mainMenu.style.display = 'flex';
+                }, 4500); 
+
+            }, 1000); // Waktu preloader
+            
+            // Muat Username & Skin dari LocalStorage BARU
+            try {
+                const savedUsername = localStorage.getItem('playerUsername'); // <-- MUAT USERNAME
+                if (savedUsername) {
+                    player.username = savedUsername;
+                    usernameInput.value = savedUsername; // Perbarui kolom input
+                }
+            } catch (e) {
+                console.error("Failed to load username from localStorage", e);
+            }
+
+            try {
+                const savedSkin = localStorage.getItem('playerCustomSkin'); // <-- MUAT SKIN
+                if (savedSkin) {
+                    playerSkinDataUrl = savedSkin;
+                    playerSkinImage.src = playerSkinDataUrl;
+                }
+            } catch (e) {
+                console.error("Failed to load skin from localStorage", e);
+            }
+            
+            // Inisialisasi Skin Canvas
+            drawSkinCanvas();
+        };
+        
+        // Jalankan game loop utama
+        update(); 
     </script>
-
-    <!-- Load Firebase first -->
-  <script type="module" src="./firebase-init.js"></script>
-
-  <!-- Then your main game scripts (if you have them) -->
-  <script src="main.js"></script>
-  <script src="otherStuff.js"></script>
-  
 </body>
 </html>
+
 
