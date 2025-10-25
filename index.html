@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>V.I.C.E.2D.PLATFORMER</title>
     <style>
+        /* ... (semua style CSS tetap sama) ... */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
+            /* ... (style body tidak berubah) ... */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -22,6 +24,7 @@
         }
 
         /* --- STYLE PRELOADER & INTRO --- */
+        /* ... (style preloader & intro tidak berubah) ... */
         #preloader {
             position: fixed;
             top: 0;
@@ -73,7 +76,9 @@
             color: #ccc;
         }
 
+
         /* --- STYLE MENU UTAMA & SUBMENU --- */
+        /* ... (style menu & submenu tidak berubah) ... */
         .fullscreen-menu {
             position: fixed;
             top: 0;
@@ -119,6 +124,7 @@
         }
         
         /* --- STYLE KONTROL & KUSTOMISASI KULIT BARU --- */
+        /* ... (style kontrol & kustomisasi tidak berubah) ... */
         #controls-screen h2 {
             font-size: 2em;
             color: #333;
@@ -215,6 +221,8 @@
             display: none; /* Default tersembunyi */
         }
         #editor-wrapper {
+            /* BARU: Tambahkan position relative untuk menampung tombol back */
+            position: relative; 
             flex-direction: row;
             align-items: flex-start;
             gap: 20px;
@@ -223,6 +231,7 @@
             position: relative;
         }
         #background-video {
+            /* ... (style video tidak berubah) ... */
             position: absolute;
             top: 0;
             left: 0;
@@ -240,6 +249,7 @@
             background-position: center;
         }
         #game-timer-display {
+            /* ... (style timer tidak berubah) ... */
             position: absolute;
             top: 10px;
             left: 10px;
@@ -250,6 +260,7 @@
         }
         /* Tampilan Corndog BARU */
         #corndog-display {
+            /* ... (style corndog tidak berubah) ... */
             position: absolute;
             top: 40px;
             left: 10px;
@@ -265,6 +276,7 @@
             height: 20px;
         }
         #controls-display {
+            /* ... (style controls-display tidak berubah) ... */
             position: absolute;
             bottom: 10px;
             right: 10px;
@@ -290,6 +302,7 @@
             font-weight: bold;
         }
         #controls-container {
+            /* ... (style controls-container tidak berubah) ... */
             margin-top: 15px;
             flex-direction: column;
             align-items: center;
@@ -297,6 +310,7 @@
             width: 800px;
         }
         #controls {
+            /* ... (style controls tidak berubah) ... */
             font-size: 1.2em;
             color: #333;
             background-color: #fff;
@@ -305,6 +319,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         button {
+            /* ... (style button tidak berubah) ... */
             padding: 10px 15px;
             font-size: 1em;
             font-family: 'Courier New', Courier, monospace;
@@ -326,6 +341,7 @@
         }
         
         /* --- Tombol & Panel Editor BARU (Inventory, Settings) --- */
+        /* ... (style panel editor tidak berubah) ... */
         #editor-top-buttons {
             display: flex;
             gap: 10px;
@@ -354,6 +370,7 @@
         }
         
         /* Panel Settings Samping (untuk object, timeline) */
+        /* ... (style panel settings tidak berubah) ... */
         #settings-panel, #timeline-settings-panel {
             width: 200px;
             background: #ffffff;
@@ -393,6 +410,7 @@
         }
         
         /* Konten Settings Game (dipindahkan) */
+        /* ... (style settings game tidak berubah) ... */
         #game-settings {
             display: flex;
             flex-direction: column;
@@ -423,6 +441,7 @@
          }
          
         /* --- Timeline & File --- */
+        /* ... (style timeline & file tidak berubah) ... */
         #timeline-header {
             display: flex;
             justify-content: center;
@@ -471,21 +490,62 @@
             gap: 10px;
             margin-top: 10px;
         }
+
+        /* --- STYLE UI DALAM GAME BARU --- */
+        #back-to-menu-in-game-btn {
+            position: absolute;
+            top: 10px;
+            right: 25px; /* Disesuaikan agar tidak tumpang tindih dengan panel settings */
+            z-index: 50;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        #back-to-menu-in-game-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        /* --- STYLE LAYAR KEMATIAN BARU --- */
+        #death-screen-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none; /* Diaktifkan oleh JS */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 150;
+        }
+        #death-screen-overlay h2 {
+            font-size: 3em;
+            color: #ff4500; /* Oranye-Merah */
+            text-shadow: 2px 2px 4px #000;
+        }
+        #death-screen-overlay button {
+            width: 250px;
+            font-size: 1.5em;
+        }
+
     </style>
 </head>
 <body>
     <!-- PRELOADER -->
+    <!-- ... (preloader tidak berubah) ... -->
     <div id="preloader">
         <div class="spinner"></div>
     </div>
 
     <!-- INTRO SCREEN -->
+    <!-- ... (intro screen tidak berubah) ... -->
     <div id="intro-screen">
         <div id="intro-line-1" class="intro-line">I PRESENT TO Y'ALL</div>
         <div id="intro-line-2" class="intro-line">CREATED BY MaAlFa123 (LOL)</div>
     </div>
 
     <!-- MENU UTAMA -->
+    <!-- ... (menu utama tidak berubah) ... -->
     <div id="main-menu" class="fullscreen-menu">
         <h1>Creative 2D Platformer</h1>
         <p>Create and play your own levels!</p>
@@ -509,6 +569,7 @@
     </div>
     
     <!-- LAYAR KONTROL BARU -->
+    <!-- ... (layar kontrol tidak berubah) ... -->
     <div id="controls-screen" class="fullscreen-menu">
         <h2>Controls & Tips</h2>
         <div id="controls-list">
@@ -533,6 +594,7 @@
     </div>
     
     <!-- LAYAR KUSTOMISASI KULIT BARU -->
+    <!-- ... (layar kustomisasi kulit tidak berubah) ... -->
     <div id="skin-customizer" class="fullscreen-menu">
         <h2>Customize Your Skin</h2>
         <div id="skin-editor-area">
@@ -558,6 +620,9 @@
 
     <!-- WRAPPER GAME & EDITOR -->
     <div id="editor-wrapper">
+        <!-- TOMBOL KEMBALI KE MENU BARU -->
+        <button id="back-to-menu-in-game-btn">Back to Menu</button>
+
         <div id="game-container">
             <video id="background-video" loop muted playsinline></video>
             <canvas id="gameCanvas" width="800" height="600"></canvas>
@@ -568,8 +633,16 @@
                 <span id="corndog-count">x 0</span>
             </div>
             <div id="controls-display"></div>
+
+            <!-- LAYAR KEMATIAN BARU -->
+            <div id="death-screen-overlay">
+                <h2>U DED</h2>
+                <button id="death-restart-btn">Restart</button>
+                <button id="death-menu-btn">Back to Menu</button>
+            </div>
         </div>
         <!-- Panel Settings Samping (Object & Timeline) -->
+        <!-- ... (panel settings tidak berubah) ... -->
         <div id="settings-panel">
             <button class="close-btn" id="close-settings-panel">X</button>
             <div id="object-settings-content">
@@ -643,6 +716,7 @@
     </div>
     
     <!-- Kontrol Editor (Bawah) -->
+    <!-- ... (kontrol editor tidak berubah) ... -->
     <div id="controls-container">
         <div id="controls">Press 'Q' to toggle Editor, 'Z' to Undo</div>
         
@@ -717,6 +791,7 @@
         </div>
         
         <!-- Timeline & File Controls (tetap) -->
+        <!-- ... (timeline & file controls tidak berubah) ... -->
         <div id="timeline-container">
             <div id="timeline-header">
                 <label>Timeline:</label>
@@ -728,6 +803,8 @@
         <div id="file-controls">
             <button id="saveButton">Save Level</button>
             <button id="loadButton">Load Level</button>
+            <!-- TOMBOL HAPUS BARU -->
+            <button id="clearAllButton" style="background-color: #ff4d4d; color: white; border-color: #ff4d4d;">Clear All</button>
             <input type="file" id="import-file-input" accept=".json" style="display: none;">
         </div>
     </div>
@@ -741,6 +818,12 @@
         const corndogDisplay = document.getElementById('corndog-display');
         const corndogCountSpan = document.getElementById('corndog-count');
         
+        // UI BARU
+        const deathScreenOverlay = document.getElementById('death-screen-overlay');
+        const deathRestartBtn = document.getElementById('death-restart-btn');
+        const deathMenuBtn = document.getElementById('death-menu-btn');
+        const backToMenuInGameBtn = document.getElementById('back-to-menu-in-game-btn');
+        
         const controlsDisplay = document.getElementById('controls-display');
         const timelineCanvas = document.getElementById('timeline-canvas');
         const timelineCtx = timelineCanvas.getContext('2d');
@@ -748,6 +831,7 @@
         const toolButtons = document.querySelectorAll('.tool-btn');
         
         // Panel Settings Samping
+        // ... (referensi panel settings tidak berubah) ...
         const settingsPanel = document.getElementById('settings-panel');
         const objectSettingsContent = document.getElementById('object-settings-content');
         const colorPicker = document.getElementById('color-picker');
@@ -771,6 +855,7 @@
         const musicBlockFileInput = document.getElementById('music-block-file');
         
         // Settings Game (Slider, dll)
+        // ... (referensi settings game tidak berubah) ...
         const laserSpeedSlider = document.getElementById('laser-speed-slider');
         const platformSpeedSlider = document.getElementById('platform-speed-slider');
         const playerSpeedSlider = document.getElementById('player-speed-slider');
@@ -787,6 +872,7 @@
         const clearBackgroundBtn = document.getElementById('clear-background-btn');
         
         // Timeline
+        // ... (referensi timeline tidak berubah) ...
         const timelineSettingsPanel = document.getElementById('timeline-settings-panel');
         const eventTextSettingsDiv = document.getElementById('event-text-settings');
         const eventTextContentInput = document.getElementById('event-text-content');
@@ -800,11 +886,15 @@
         const closeTimelinePanelBtn = document.getElementById('close-timeline-panel');
         
         // Kontrol File
+        // ... (referensi kontrol file tidak berubah) ...
         const saveButton = document.getElementById('saveButton');
         const loadButton = document.getElementById('loadButton');
         const importFileInput = document.getElementById('import-file-input');
+        // TOMBOL HAPUS BARU
+        const clearAllButton = document.getElementById('clearAllButton');
         
         // Menu Utama & Submenu
+        // ... (referensi menu tidak berubah) ...
         const mainMenu = document.getElementById('main-menu');
         const mainMenuButtons = document.getElementById('main-menu-buttons');
         const playSubMenu = document.getElementById('play-submenu');
@@ -817,6 +907,7 @@
         const usernameInput = document.getElementById('username-input');
 
         // Tombol & Layar BARU
+        // ... (referensi tombol & layar tidak berubah) ...
         const controlsBtn = document.getElementById('controls-btn');
         const controlsScreen = document.getElementById('controls-screen');
         const backToMainFromControlsBtn = document.getElementById('back-to-main-from-controls-btn');
@@ -825,12 +916,14 @@
         const backToMainFromSkinBtn = document.getElementById('back-to-main-from-skin-btn');
         
         // Kontrol Editor BARU
+        // ... (referensi kontrol editor tidak berubah) ...
         const inventoryToggleBtn = document.getElementById('inventory-toggle-btn');
         const settingsToggleBtn = document.getElementById('settings-toggle-btn');
         const inventoryPanel = document.getElementById('inventory-panel');
         const gameSettingsPanel = document.getElementById('game-settings-panel');
         
         // Kustomisasi Kulit BARU
+        // ... (referensi kustomisasi kulit tidak berubah) ...
         const skinCanvas = document.getElementById('skin-canvas');
         const skinCtx = skinCanvas.getContext('2d');
         const skinColorPicker = document.getElementById('skin-color-picker');
@@ -872,8 +965,10 @@
         const gravity = 0.6;
         const MAX_JUMPS = 2;
         const JUMP_BUFFER_FRAMES = 8;
-        // Coyote Time BARU
-        const COYOTE_TIME_FRAMES = 6; // 100ms @ 60fps
+        // Coyote Time BARU - DIUBAH MENJADI 1 DETIK (60 frame)
+        // const COYOTE_TIME_FRAMES = 60; // --- MOD --- Dihapus
+        const COYOTE_TIME_FRAMES_NORMAL = 60; // 1 detik (sesuai kode Anda)
+        const COYOTE_TIME_FRAMES_WALLJUMP = 90; // 1.5 detik (bonus setelah wall jump)
         
         const DELAY_BLOCK_FADE_TIME = 300; 
 
@@ -885,6 +980,12 @@
 
         let history = [];
         let historyIndex = -1;
+
+        // --- STATE PEMAIN & KEMATIAN BARU ---
+        let playerState = 'alive'; // 'alive', 'dying', 'dead'
+        let deathTimer = 0;
+        const DEATH_ANIM_DURATION = 90; // 90 frame @ 60fps ~= 1.5 detik
+        let shatterParticles = [];
 
         function saveState() {
             // ... (fungsi saveState tidak berubah) ...
@@ -918,6 +1019,7 @@
         
         const playerStart = { x: 50, y: worldHeight - 60 };
         const player = {
+            // ... (objek player tidak berubah) ...
             x: playerStart.x, y: playerStart.y, width: 40, height: 40,
             originalHeight: 40, velocityX: 0, velocityY: 0, jumpPower: 13,
             jumpsMade: 0, color: '#FFFFFF', acceleration: 0.4, friction: 0.3,
@@ -928,14 +1030,17 @@
             dashSpeed: 0, dashFriction: 0.2, isSprinting: false, 
             sprintMultiplier: 1.6,
             hasHook: false, 
+            lastAction: 'landed', // --- NEW --- 'landed', 'jump', 'walljump'
             username: 'Player'
         };
 
         let levelObjects = [
+            // ... (levelObjects default tidak berubah) ...
             { id: Date.now(), type: 'platform', x: 0, y: worldHeight - 20, width: worldWidth, height: 20, color: '#999999', isSolid: true },
         ];
         
         let levelSettings = {
+            // ... (levelSettings tidak berubah) ...
             laserSpeed: 1.5,
             platformSpeed: 2,
             playerMaxSpeed: 5,
@@ -994,10 +1099,18 @@
             else if (o === 'down') { v1 = { x: spike.x, y: spike.y }; v2 = { x: spike.x + spike.width, y: spike.y }; v3 = { x: spike.x + spike.width / 2, y: spike.y + spike.height }; } 
             else if (o === 'left') { v1 = { x: spike.x + spike.width, y: spike.y }; v2 = { x: spike.x + spike.width, y: spike.y + spike.height }; v3 = { x: spike.x, y: spike.y + spike.height / 2 }; } 
             else if (o === 'right') { v1 = { x: spike.x, y: spike.y }; v2 = { x: spike.x, y: spike.y + spike.height }; v3 = { x: spike.x + spike.width, y: spike.y + spike.height / 2 }; }
-            return playerCorners.some(corner => isPointInTriangle(corner, v1, v2, v3));
+            // PERUBAHAN: Panggil triggerPlayerDeath alih-alih resetPlayer
+            const collided = playerCorners.some(corner => isPointInTriangle(corner, v1, v2, v3));
+            if (collided) {
+                triggerPlayerDeath(); // MEMICU KEMATIAN
+                return true;
+            }
+            return false;
         }
 
-        function resetPlayer() {
+        // FUNGSI resetPlayer DIGANTI NAMA MENJADI respawnPlayer
+        // ... (fungsi respawnPlayer tidak berubah) ...
+        function respawnPlayer() {
             gameWon = false;
             gameTime = 0;
             player.hasHook = false; 
@@ -1009,17 +1122,16 @@
                 audio.currentTime = 0;
             });
 
-            // Logika Checkpoint BARU
+            // Logika Checkpoint DIPERBARUI
             let spawnPoint = levelObjects.find(obj => obj.type === 'spawn');
+            
+            // Checkpoint SEKARANG PERSISTEN. Tidak di-reset ke null.
             const startPos = checkpointPosition || (spawnPoint ? {x: spawnPoint.x, y: spawnPoint.y} : playerStart);
             
-            // Jika kita menggunakan checkpoint, hapus benderanya
-            if (checkpointPosition) {
-                levelObjects = levelObjects.filter(obj => obj.type !== 'flag');
-                checkpointPosition = null; // Checkpoint hanya sekali pakai
-            }
-
+            // Bendera tidak lagi dihapus saat respawn, hanya saat bendera baru ditanam
+            
             // Reset semua object level
+            // ... (logika reset objek tidak berubah) ...
             levelObjects.forEach(obj => { 
                 if(obj.movePath) { obj.x = obj.movePath.start.x; obj.y = obj.movePath.start.y; obj.moveDirection = 1; }
                 if(obj.type === 'button') obj.activated = false;
@@ -1030,11 +1142,10 @@
                     obj.isActive = false;
                 }
                 if(obj.type === 'grappler') { obj.visible = false; obj.collected = false; }
-                // Reset Corndog BARU - DIHAPUS DARI SINI
-                // if(obj.type === 'corndog') { obj.collected = false; }
             });
             
-            // corndogCount = 0; // Reset corndog count - DIHAPUS DARI SINI
+            // corndogCount TIDAK di-reset di sini
+            // obj.collected TIDAK di-reset di sini
             updateCorndogDisplay();
             
             Object.assign(player, { x: startPos.x, y: startPos.y, velocityX: 0, velocityY: 0, jumpsMade: 0, isDashing: false, isWallHolding: false, coyoteTimeCounter: 0, isCrouching: false, height: player.originalHeight });
@@ -1042,6 +1153,63 @@
             // Snap kamera instan
             camera.x = player.x - canvas.width / 2 + player.width / 2;
             camera.y = player.y - canvas.height / 2 + player.height / 2;
+            
+            // Sembunyikan UI Kematian & reset state (BARU)
+            playerState = 'alive';
+            deathTimer = 0;
+            shatterParticles = [];
+            deathScreenOverlay.style.display = 'none';
+        }
+        
+        // FUNGSI KEMATIAN BARU
+        // ... (fungsi triggerPlayerDeath tidak berubah) ...
+        function triggerPlayerDeath() {
+            if (playerState !== 'alive' || isPlayOnlyMode === false) return; // Hanya mati di mode 'play'
+            
+            playerState = 'dying';
+            deathTimer = 0;
+            shatterParticles = [];
+            
+            // Buat partikel pecah
+            for (let i = 0; i < 50; i++) {
+                shatterParticles.push({
+                    x: player.x + player.width / 2,
+                    y: player.y + player.height / 2,
+                    width: Math.random() * 6 + 2,
+                    height: Math.random() * 6 + 2,
+                    velocityX: (Math.random() - 0.5) * 8, // Disesuaikan untuk 60fps
+                    velocityY: (Math.random() - 0.5) * 15 - 5, // Dorongan ke atas
+                    color: '#ff4500' // Merah-Oranye
+                });
+            }
+        }
+        
+        // FUNGSI MENU UTAMA BARU
+        // ... (fungsi goToMainMenu tidak berubah) ...
+        function goToMainMenu() {
+            document.getElementById('editor-wrapper').style.display = 'none';
+            document.getElementById('controls-container').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+            
+            // Sembunyikan submenu & layar lain
+            playSubMenu.style.display = 'none';
+            mainMenuButtons.style.display = 'flex';
+            controlsScreen.style.display = 'none';
+            skinCustomizer.style.display = 'none';
+            deathScreenOverlay.style.display = 'none';
+            
+            // Stop semua audio
+            Object.values(activeAudio).forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+            
+            // Reset state game
+            editorMode = false;
+            isPlayOnlyMode = false;
+            gameWon = false;
+            playerState = 'alive';
+            checkpointPosition = null; // PENTING: Reset checkpoint saat kembali ke menu
         }
 
         function canStandUp() {
@@ -1054,6 +1222,7 @@
             const key = e.key.toLowerCase();
             
             // Cek jika fokus ada di input teks
+            // ... (logika fokus input tidak berubah) ...
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
                 return; // Jangan proses hotkey jika sedang mengetik
             }
@@ -1069,15 +1238,20 @@
                 controlsDisplay.style.display = editorMode ? 'none' : 'block';
                 controlsText.textContent = editorMode ? "EDITOR MODE [W,A,S,D to Pan | Q to Toggle]" : "PLAY MODE";
                 if (!editorMode) { 
-                    selectedObjectId = null; selectedTimelineEventId = null; updateSettingsPanel(); updateTimelineSettingsPanel(); resetPlayer(); 
+                    selectedObjectId = null; selectedTimelineEventId = null; updateSettingsPanel(); updateTimelineSettingsPanel(); 
+                    respawnPlayer(); // Panggil respawnPlayer, BUKAN triggerDeath
                 } else {
                     Object.values(activeAudio).forEach(audio => audio.pause());
                 }
                 return;
             }
             if (key === 'r' && editorMode) { isSelectionRotated = !isSelectionRotated; return; }
+            
+            // Jangan terima input gameplay jika tidak hidup
+            if (playerState !== 'alive') return; 
 
             // Gameplay Keys
+            // ... (sisa logika keydown tidak berubah) ...
             if (key === 'd') keys.d = true;
             else if (key === 'a') keys.a = true;
             else if (key === 's') keys.s = true;
@@ -1093,7 +1267,16 @@
                 if (!e.repeat && !editorMode) {
                     if (player.coyoteTimeCounter > 0 || (player.isWallHolding && !onGround)) { // Lompat dasar, coyote, atau lompat dinding
                         player.velocityY = -player.jumpPower;
-                        player.jumpsMade = 1;
+                        
+                        // BARU: Reset lompatan saat wall-jump, tapi hitung sbg 1 saat lompat biasa
+                        if (player.isWallHolding) {
+                            player.jumpsMade = 0; // RESET jumps on wall jump
+                            player.lastAction = 'walljump'; // --- NEW --- Catat wall jump
+                        } else {
+                            player.jumpsMade = 1; // Normal ground/coyote jump
+                            player.lastAction = 'jump'; // --- NEW --- Catat lompatan normal
+                        }
+                        
                         jumpBufferCounter = 0;
                         player.coyoteTimeCounter = 0;
                         if (player.isWallHolding) {
@@ -1102,7 +1285,7 @@
                         }
                     } else if (!player.isWallHolding && !hookState.isHooked && player.jumpsMade > 0 && player.jumpsMade < MAX_JUMPS) { // Double jump
                         player.velocityY = -player.jumpPower;
-                        player.jumpsMade++;
+                        player.jumpsMade++; // <--- INCREMENTS JUMPS
                         jumpBufferCounter = 0;
                     }
                 }
@@ -1117,6 +1300,7 @@
         }
 
         function keyUpHandler(e) {
+            // ... (logika keyup tidak berubah) ...
             const key = e.key.toLowerCase();
             if (key === 'd') keys.d = false;
             else if (key === 'a') keys.a = false;
@@ -1135,7 +1319,7 @@
         }
 
         function updateSettingsPanel() {
-            // ... (fungsi updateSettingsPanel hampir tidak berubah) ...
+            // ... (fungsi updateSettingsPanel tidak berubah) ...
             const selectedObject = levelObjects.find(obj => obj.id === selectedObjectId);
             
             textBlockSettingsDiv.style.display = 'none';
@@ -1201,6 +1385,7 @@
         }
         
         function mouseDownHandler(e) {
+            // ... (logika mousedown tidak berubah) ...
             if (!editorMode) return;
             e.preventDefault();
             updateMousePos(e);
@@ -1256,7 +1441,7 @@
         }
 
         function mouseUpHandler(e) {
-            // ... (fungsi mouseUpHandler hampir tidak berubah) ...
+            // ... (logika mouseup tidak berubah) ...
             if (!editorMode) return;
             if (pathCreationState.isCreating) { 
                 // ... (logika path creation tidak berubah) ...
@@ -1368,6 +1553,7 @@
         });
         
         // --- TEXT BLOCK SETTINGS LISTENERS ---
+        // ... (listener settings text block tidak berubah) ...
         function updateSelectedTextBlock(prop, value) {
              // ... (fungsi updateSelectedTextBlock tidak berubah) ...
              if (selectedObjectId) {
@@ -1459,6 +1645,7 @@
         playerJumpSlider.addEventListener('change', saveState);
 
         backgroundColorPicker.addEventListener('input', (e) => {
+            // ... (listener backgroundColorPicker tidak berubah) ...
             if(editorMode) {
                 clearBackgroundMedia();
                 levelSettings.backgroundColor = e.target.value;
@@ -1471,6 +1658,7 @@
         setBackgroundVideoBtn.addEventListener('click', () => backgroundVideoInput.click());
 
         clearBackgroundBtn.addEventListener('click', () => {
+            // ... (listener clearBackgroundBtn tidak berubah) ...
             clearBackgroundMedia();
             saveState();
         });
@@ -1667,11 +1855,13 @@
         });
         
         closeSettingsPanelBtn.addEventListener('click', () => {
+            // ... (listener closeSettingsPanelBtn tidak berubah) ...
             selectedObjectId = null;
             updateSettingsPanel();
         });
 
         closeTimelinePanelBtn.addEventListener('click', () => {
+            // ... (listener closeTimelinePanelBtn tidak berubah) ...
             selectedTimelineEventId = null;
             updateTimelineSettingsPanel();
             drawTimeline(); 
@@ -1699,6 +1889,7 @@
         });
 
         // Load Button (di editor)
+        // ... (listener loadButton tidak berubah) ...
         loadButton.addEventListener('click', () => {
             loadMode = 'editor'; // Set mode untuk load ke editor
             isPlayOnlyMode = false;
@@ -1706,6 +1897,7 @@
         });
 
         // Listener Input File (untuk SEMUA mode load)
+        // ... (listener importFileInput tidak berubah) ...
         importFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1730,8 +1922,40 @@
             reader.readAsText(file);
             importFileInput.value = '';
         });
+        
+        // LISTENER TOMBOL HAPUS BARU
+        clearAllButton.addEventListener('click', () => {
+            // Hanya berfungsi di mode editor
+            if (!editorMode) return;
+            
+            // Ini adalah tindakan berbahaya. Karena kita tidak bisa menggunakan confirm(),
+            // kita akan langsung melanjutkannya. Undo (Z) bisa mengembalikannya.
+            
+            // Hapus semua objek kecuali platform dasar
+            levelObjects = [
+                { id: Date.now(), type: 'platform', x: 0, y: worldHeight - 20, width: worldWidth, height: 20, color: '#999999', isSolid: true }
+            ];
+            
+            // Reset pengaturan timeline
+            levelSettings.timelineEvents = [];
+            drawTimeline();
+
+            // Reset posisi player & checkpoint
+            checkpointPosition = null;
+            const startPos = playerStart; // Reset ke default
+            Object.assign(player, { x: startPos.x, y: startPos.y });
+
+            // Deselect objek
+            selectedObjectId = null;
+            updateSettingsPanel();
+            
+            // Simpan state "kosong" ini ke history
+            saveState(); 
+            console.log("Level cleared!");
+        });
 
         function loadLevelData(data, playOnly) {
+            // ... (fungsi loadLevelData tidak berubah) ...
             levelObjects = data.objects;
             levelSettings = data.settings;
             
@@ -1835,6 +2059,7 @@
         }
 
         function drawLevelObjects() {
+            // ... (fungsi drawLevelObjects tidak berubah) ...
             levelObjects.forEach(obj => {
                 if (!editorMode && obj.isSolid === false && obj.type !== 'text_block' && obj.type !== 'grappler' && obj.type !== 'corndog' && obj.type !== 'flag') { return; }
                 let color = obj.color || '#999';
@@ -1932,6 +2157,14 @@
             });
         }
         
+        // FUNGSI GAMBAR PARTIKEL BARU
+        function drawShatterParticles() {
+            shatterParticles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+            });
+        }
+        
         function drawChasingLaser() {
             // ... (fungsi drawChasingLaser tidak berubah) ...
             levelObjects.forEach(laserSource => {
@@ -2022,7 +2255,11 @@
         }
         
         function drawPlayer(p_object, isLocalPlayer) {
+            // DIPERBARUI: Jangan gambar player jika sedang dalam animasi kematian
+            if (isLocalPlayer && playerState === 'dying') return;
+            
             // Logika Skin Kustom BARU
+            // ... (sisa logika drawPlayer tidak berubah) ...
             if (isLocalPlayer && playerSkinDataUrl && playerSkinImage.complete && playerSkinImage.naturalHeight !== 0) {
                 ctx.imageSmoothingEnabled = false; // Jaga piksel tetap tajam
                 ctx.drawImage(playerSkinImage, p_object.x, p_object.y, p_object.width, p_object.height);
@@ -2156,6 +2393,38 @@
             }
         }
         
+        // FUNGSI ANIMASI KEMATIAN BARU
+        function updateDeathAnimation() {
+            deathTimer++;
+            
+            // Update partikel
+            for (let i = shatterParticles.length - 1; i >= 0; i--) {
+                const p = shatterParticles[i];
+                p.x += p.velocityX;
+                p.y += p.velocityY;
+                p.velocityY += gravity; // Partikel jatuh dengan gravitasi
+                
+                // Hapus partikel jika sudah terlalu lama (opsional)
+                if (p.y > camera.y + canvas.height + 100) {
+                     shatterParticles.splice(i, 1);
+                }
+            }
+            
+            // Transisi ke state 'dead' setelah animasi selesai
+            if (deathTimer >= DEATH_ANIM_DURATION) {
+                playerState = 'dead';
+                deathScreenOverlay.style.display = 'flex'; // Tampilkan menu kematian
+            }
+        }
+        
+        // FUNGSI GAMBAR OVERLAY KEMATIAN BARU
+        function drawDeathAnimationOverlay() {
+            // Gambar fade hitam di atas UI (screen space)
+            let opacity = Math.min(0.9, deathTimer / DEATH_ANIM_DURATION); // Max 0.9 agar tidak hitam total
+            ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
         let lastUpdateTime = 0;
         const updateInterval = 1000 / 15; 
         
@@ -2164,382 +2433,416 @@
         function update() {
             const now = performance.now();
             
+            // --- LOOP UTAMA DIPERBARUI DENGAN STATE ---
+            
             if (!editorMode) {
-                if(gameWon) {
-                    // Game dimenangkan
-                } else {
-                    gameTime += 1 / 60;
-                    gameTimerDisplay.textContent = gameTime.toFixed(2);
-                    updateBackgroundColor();
-                    
-                    if (levelSettings.hookEnabled && player.hasHook) {
-                        updateHook();
-                    }
-                    
-                    const isPlayerHooked = hookState.isHooked;
-                    const hookedPlatformId = hookState.attachedObjectId;
-
-                    // --- LOGIKA LASER ---
-                    levelObjects.forEach(laserSource => {
-                        // ... (logika laser tidak berubah) ...
-                        if(laserSource.type === 'laser_source' && laserSource.isActive) {
-                            let o = laserSource.orientation || 'left';
-                            if(o === 'left' || o === 'up') laserSource.position += levelSettings.laserSpeed;
-                            else laserSource.position -= levelSettings.laserSpeed;
-
-                            let laserHitbox;
-                            if(o === 'left') laserHitbox = {x: laserSource.position, y: 0, width: 10, height: worldHeight};
-                            if(o === 'right') laserHitbox = {x: laserSource.position - 10, y: 0, width: 10, height: worldHeight};
-                            if(o === 'up') laserHitbox = {x: 0, y: laserSource.position, width: worldWidth, height: 10};
-                            if(o === 'down') laserHitbox = {x: 0, y: laserSource.position - 10, width: worldWidth, height: 10};
-                            if(laserHitbox && checkRectCollision(player, laserHitbox)) resetPlayer();
-                        }
-                    });
-
-
-                    // --- LOGIKA PLATFORM BERGERAK ---
-                    levelObjects.forEach(obj => {
-                        // ... (logika platform bergerak tidak berubah) ...
-                        if (obj.movePath) {
-                            if (isPlayerHooked && obj.id !== hookedPlatformId) {
-                                return; 
-                            }
-
-                            const target = obj.moveDirection === 1 ? obj.movePath.end : obj.movePath.start;
-                            const dx = target.x - obj.x, dy = target.y - obj.y;
-                            const dist = Math.sqrt(dx * dx + dy * dy);
-                            const speed = obj.moveSpeed || levelSettings.platformSpeed;
-                            
-                            let moveX = 0, moveY = 0;
-                            if (dist >= speed) {
-                                moveX = (dx / dist) * speed;
-                                moveY = (dy / dist) * speed;
-                            }
-
-                            if (isPlayerHooked && obj.id === hookedPlatformId) {
-                                player.x += moveX; player.y += moveY;
-                                hookState.x += moveX; hookState.y += moveY;
-                            } else if (!isPlayerHooked) {
-                                const preMovePlayerHitbox = {x: player.x, y: player.y, width: player.width, height: player.height + 1};
-                                if (checkRectCollision(preMovePlayerHitbox, obj)) {
-                                    player.x += moveX; player.y += moveY;
-                                }
-                            }
-
-                            if (dist < speed) {
-                                obj.x = target.x; obj.y = target.y; 
-                                obj.moveDirection *= -1;
-                            } else {
-                                obj.x += moveX; obj.y += moveY;
-                            }
-                        }
-                    });
-                    
-                    if (isPlayerHooked) {
-                        // --- FISIKA SWINGING ---
-                        // ... (logika swing tidak berubah) ...
-                        if (keys.d) player.velocityX += 0.2;
-                        if (keys.a) player.velocityX -= 0.2;
-                        
-                        if(keys.w) hookState.ropeLength -= 1.5;
-                        if(keys.s) hookState.ropeLength += 1.5;
-                        hookState.ropeLength = Math.max(20, Math.min(hookState.maxLength, hookState.ropeLength));
-
-                        player.velocityY += gravity;
-                        player.x += player.velocityX;
-
-                        levelObjects.forEach(obj => {
-                            if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
-                                if (player.velocityX > 0 && player.x - player.velocityX + player.width <= obj.x + 1) {
-                                    player.x = obj.x - player.width;
-                                    player.velocityX = 0;
-                                } else if (player.velocityX < 0 && player.x - player.velocityX >= obj.x + obj.width - 1) {
-                                    player.x = obj.x + obj.width;
-                                    player.velocityX = 0;
-                                }
-                            }
-                        });
-
-                        player.y += player.velocityY;
-
-                        levelObjects.forEach(obj => {
-                            if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
-                                if (player.velocityY > 0 && player.y - player.velocityY + player.height <= obj.y + 1) {
-                                    player.y = obj.y - player.height;
-                                    player.velocityY = 0;
-                                } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) {
-                                    player.y = obj.y + obj.height;
-                                    player.velocityY = 0;
-                                }
-                            }
-                        });
-
-                        player.velocityX *= 0.995; 
-
-                        const playerCenterX = player.x + player.width / 2;
-                        const playerCenterY = player.y + player.height / 2;
-                        const dx = playerCenterX - hookState.x;
-                        const dy = playerCenterY - hookState.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        
-                        if (dist > hookState.ropeLength) {
-                            const diff = dist - hookState.ropeLength;
-                            const percent = diff / dist;
-                            const offsetX = dx * percent;
-                            const offsetY = dy * percent;
-
-                            player.x -= offsetX;
-                            player.y -= offsetY;
-                            
-                            const dot = player.velocityX * (dx / dist) + player.velocityY * (dy / dist);
-                            player.velocityX -= (dx / dist) * dot;
-                            player.velocityY -= (dy / dist) * dot;
-                        }
-
+                
+                // State 1: Sedang Hidup
+                if (playerState === 'alive') {
+                    if(gameWon) {
+                        // Game dimenangkan
                     } else {
-                        // --- FISIKA PLATFORMING NORMAL ---
-                        onGround = false; // Reset di setiap frame
+                        gameTime += 1 / 60;
+                        gameTimerDisplay.textContent = gameTime.toFixed(2);
+                        updateBackgroundColor();
                         
-                        const touchingHitbox = { x: player.x - 1, y: player.y - 1, width: player.width + 2, height: player.height + 2 };
-                        levelObjects.forEach(obj => {
-                            // ... (logika delay block tidak berubah) ...
-                            if (obj.type === 'delay') {
-                                if (!obj.isFading && obj.isSolid && checkRectCollision(touchingHitbox, obj)) {
-                                    obj.isFading = true;
-                                }
-                                if (obj.isFading) {
-                                    obj.delayTimer = Math.min(DELAY_BLOCK_FADE_TIME, obj.delayTimer + 1);
-                                }
-                                obj.phased = obj.delayTimer >= DELAY_BLOCK_FADE_TIME;
+                        if (levelSettings.hookEnabled && player.hasHook) {
+                            updateHook();
+                        }
+                        
+                        const isPlayerHooked = hookState.isHooked;
+                        const hookedPlatformId = hookState.attachedObjectId;
+
+                        // --- LOGIKA LASER ---
+                        levelObjects.forEach(laserSource => {
+                            // ... (logika laser tidak berubah) ...
+                            if(laserSource.type === 'laser_source' && laserSource.isActive) {
+                                let o = laserSource.orientation || 'left';
+                                if(o === 'left' || o === 'up') laserSource.position += levelSettings.laserSpeed;
+                                else laserSource.position -= levelSettings.laserSpeed;
+
+                                let laserHitbox;
+                                if(o === 'left') laserHitbox = {x: laserSource.position, y: 0, width: 10, height: worldHeight};
+                                if(o === 'right') laserHitbox = {x: laserSource.position - 10, y: 0, width: 10, height: worldHeight};
+                                if(o === 'up') laserHitbox = {x: 0, y: laserSource.position, width: worldWidth, height: 10};
+                                if(o === 'down') laserHitbox = {x: 0, y: laserSource.position - 10, width: worldWidth, height: 10};
+                                // PERUBAHAN: Panggil triggerPlayerDeath
+                                if(laserHitbox && checkRectCollision(player, laserHitbox)) triggerPlayerDeath();
                             }
                         });
 
-                        if (jumpBufferCounter > 0) jumpBufferCounter--;
-                        
-                        let wallTouchDirection = 0;
-                        
-                        if (player.isWallHolding) {
-                            // ... (logika wall holding tidak berubah) ...
-                            let isStillNextToWall = false;
-                            const checkRect = { x: player.x + (player.wallDirection === 1 ? player.width : -1), y: player.y, width: 1, height: player.height };
-                            for (const obj of levelObjects) {
-                                if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased)  || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(checkRect, obj)) {
-                                    isStillNextToWall = true; break;
+
+                        // --- LOGIKA PLATFORM BERGERAK ---
+                        // ... (logika platform bergerak tidak berubah) ...
+                        levelObjects.forEach(obj => {
+                            if (obj.movePath) {
+                                if (isPlayerHooked && obj.id !== hookedPlatformId) {
+                                    return; 
                                 }
-                            }
-                            if (!isStillNextToWall) { 
-                                player.isWallHolding = false;
-                            } else {
-                                player.velocityX = 0;
-                                if (keys.w) { 
-                                    player.velocityY -= player.wallClimbAcceleration;
-                                    if (player.velocityY < -player.maxWallClimbSpeed) player.velocityY = -player.maxWallClimbSpeed;
-                                } else if (keys.s) {
-                                    player.velocityY += player.wallClimbAcceleration;
-                                    if (player.velocityY > player.maxWallClimbSpeed) player.velocityY = player.maxWallClimbSpeed;
-                                } else {
-                                    if (player.velocityY > 0) {
-                                        player.velocityY -= player.wallClimbFriction;
-                                        if (player.velocityY < 0) player.velocityY = 0;
-                                    } else if (player.velocityY < 0) {
-                                        player.velocityY += player.wallClimbFriction;
-                                        if (player.velocityY > 0) player.velocityY = 0;
+
+                                const target = obj.moveDirection === 1 ? obj.movePath.end : obj.movePath.start;
+                                const dx = target.x - obj.x, dy = target.y - obj.y;
+                                const dist = Math.sqrt(dx * dx + dy * dy);
+                                const speed = obj.moveSpeed || levelSettings.platformSpeed;
+                                
+                                let moveX = 0, moveY = 0;
+                                if (dist >= speed) {
+                                    moveX = (dx / dist) * speed;
+                                    moveY = (dy / dist) * speed;
+                                }
+
+                                if (isPlayerHooked && obj.id === hookedPlatformId) {
+                                    player.x += moveX; player.y += moveY;
+                                    hookState.x += moveX; hookState.y += moveY;
+                                } else if (!isPlayerHooked) {
+                                    const preMovePlayerHitbox = {x: player.x, y: player.y, width: player.width, height: player.height + 1};
+                                    if (checkRectCollision(preMovePlayerHitbox, obj)) {
+                                        player.x += moveX; player.y += moveY;
                                     }
                                 }
-                                const isPressingAway = (keys.a && player.wallDirection === 1) || (keys.d && player.wallDirection === -1);
-                                if (isPressingAway) {
-                                    player.isWallHolding = false; 
-                                    player.jumpsMade = 1;
+
+                                if (dist < speed) {
+                                    obj.x = target.x; obj.y = target.y; 
+                                    obj.moveDirection *= -1;
+                                } else {
+                                    obj.x += moveX; obj.y += moveY;
                                 }
                             }
-                        } 
+                        });
                         
-                        if (!player.isWallHolding) {
-                            player.isSprinting = keys.shift && !player.isCrouching && !player.isDashing;
-                            let currentMaxSpeed = player.maxSpeed * (player.isSprinting ? player.sprintMultiplier : 1);
-                            if (!player.isDashing) {
-                                if (keys.d) { player.velocityX = Math.min(currentMaxSpeed, player.velocityX + player.acceleration); } 
-                                else if (keys.a) { player.velocityX = Math.max(-currentMaxSpeed, player.velocityX - player.acceleration); } 
-                                else {
-                                    if (player.velocityX > 0) { player.velocityX = Math.max(0, player.velocityX - player.friction); } 
-                                    else if (player.velocityX < 0) { player.velocityX = Math.min(0, player.velocityX + player.friction); }
+                        if (isPlayerHooked) {
+                            // --- FISIKA SWINGING ---
+                            // ... (logika swing tidak berubah) ...
+                            if (keys.d) player.velocityX += 0.2;
+                            if (keys.a) player.velocityX -= 0.2;
+                            
+                            if(keys.w) hookState.ropeLength -= 1.5;
+                            if(keys.s) hookState.ropeLength += 1.5;
+                            hookState.ropeLength = Math.max(20, Math.min(hookState.maxLength, hookState.ropeLength));
+
+                            player.velocityY += gravity;
+                            player.x += player.velocityX;
+
+                            levelObjects.forEach(obj => {
+                                if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
+                                    if (player.velocityX > 0 && player.x - player.velocityX + player.width <= obj.x + 1) {
+                                        player.x = obj.x - player.width;
+                                        player.velocityX = 0;
+                                    } else if (player.velocityX < 0 && player.x - player.velocityX >= obj.x + obj.width - 1) {
+                                        player.x = obj.x + obj.width;
+                                        player.velocityX = 0;
+                                    }
+                                }
+                            });
+
+                            player.y += player.velocityY;
+
+                            levelObjects.forEach(obj => {
+                                if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
+                                    if (player.velocityY > 0 && player.y - player.velocityY + player.height <= obj.y + 1) {
+                                        player.y = obj.y - player.height;
+                                        player.velocityY = 0;
+                                    } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) {
+                                        player.y = obj.y + obj.height;
+                                        player.velocityY = 0;
+                                    }
+                                }
+                            });
+
+                            player.velocityX *= 0.995; 
+
+                            const playerCenterX = player.x + player.width / 2;
+                            const playerCenterY = player.y + player.height / 2;
+                            const dx = playerCenterX - hookState.x;
+                            const dy = playerCenterY - hookState.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (dist > hookState.ropeLength) {
+                                const diff = dist - hookState.ropeLength;
+                                const percent = diff / dist;
+                                const offsetX = dx * percent;
+                                const offsetY = dy * percent;
+
+                                player.x -= offsetX;
+                                player.y -= offsetY;
+                                
+                                const dot = player.velocityX * (dx / dist) + player.velocityY * (dy / dist);
+                                player.velocityX -= (dx / dist) * dot;
+                                player.velocityY -= (dy / dist) * dot;
+                            }
+
+                        } else {
+                            // --- FISIKA PLATFORMING NORMAL ---
+                            onGround = false; // Reset di setiap frame
+                            
+                            // ... (logika delay block tidak berubah) ...
+                            const touchingHitbox = { x: player.x - 1, y: player.y - 1, width: player.width + 2, height: player.height + 2 };
+                            levelObjects.forEach(obj => {
+                                if (obj.type === 'delay') {
+                                    if (!obj.isFading && obj.isSolid && checkRectCollision(touchingHitbox, obj)) {
+                                        obj.isFading = true;
+                                    }
+                                    if (obj.isFading) {
+                                        obj.delayTimer = Math.min(DELAY_BLOCK_FADE_TIME, obj.delayTimer + 1);
+                                    }
+                                    obj.phased = obj.delayTimer >= DELAY_BLOCK_FADE_TIME;
+                                }
+                            });
+
+                            if (jumpBufferCounter > 0) jumpBufferCounter--;
+                            
+                            let wallTouchDirection = 0;
+                            
+                            if (player.isWallHolding) {
+                                // ... (logika wall holding tidak berubah) ...
+                                let isStillNextToWall = false;
+                                const checkRect = { x: player.x + (player.wallDirection === 1 ? player.width : -1), y: player.y, width: 1, height: player.height };
+                                for (const obj of levelObjects) {
+                                    if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased)  || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(checkRect, obj)) {
+                                        isStillNextToWall = true; break;
+                                    }
+                                }
+                                if (!isStillNextToWall) { 
+                                    player.isWallHolding = false;
+                                } else {
+                                    player.velocityX = 0;
+                                    if (keys.w) { 
+                                        player.velocityY -= player.wallClimbAcceleration;
+                                        if (player.velocityY < -player.maxWallClimbSpeed) player.velocityY = -player.maxWallClimbSpeed;
+                                    } else if (keys.s) {
+                                        player.velocityY += player.wallClimbAcceleration;
+                                        if (player.velocityY > player.maxWallClimbSpeed) player.velocityY = player.maxWallClimbSpeed;
+                                    } else {
+                                        if (player.velocityY > 0) {
+                                            player.velocityY -= player.wallClimbFriction;
+                                            if (player.velocityY < 0) player.velocityY = 0;
+                                        } else if (player.velocityY < 0) {
+                                            player.velocityY += player.wallClimbFriction;
+                                            if (player.velocityY > 0) player.velocityY = 0;
+                                        }
+                                    }
+                                    const isPressingAway = (keys.a && player.wallDirection === 1) || (keys.d && player.wallDirection === -1);
+                                    if (isPressingAway) {
+                                        player.isWallHolding = false; 
+                                        player.jumpsMade = 1;
+                                    }
+                                }
+                            } 
+                            
+                            if (!player.isWallHolding) {
+                                // ... (logika sprint tidak berubah) ...
+                                player.isSprinting = keys.shift && !player.isCrouching && !player.isDashing;
+                                let currentMaxSpeed = player.maxSpeed * (player.isSprinting ? player.sprintMultiplier : 1);
+                                if (!player.isDashing) {
+                                    if (keys.d) { player.velocityX = Math.min(currentMaxSpeed, player.velocityX + player.acceleration); } 
+                                    else if (keys.a) { player.velocityX = Math.max(-currentMaxSpeed, player.velocityX - player.acceleration); } 
+                                    else {
+                                        if (player.velocityX > 0) { player.velocityX = Math.max(0, player.velocityX - player.friction); } 
+                                        else if (player.velocityX < 0) { player.velocityX = Math.min(0, player.velocityX + player.friction); }
+                                    }
+                                }
+                                
+                                // Logika Coyote Time DITERAPKAN
+                                if (player.coyoteTimeCounter <= 0) { 
+                                    player.velocityY += gravity; 
                                 }
                             }
                             
-                            // Logika Coyote Time DITERAPKAN
-                            if (player.coyoteTimeCounter <= 0) { 
-                                player.velocityY += gravity; 
-                            }
-                        }
-                        
-                        // ... (logika crouch & dash tidak berubah) ...
-                        const touchingGround = levelObjects.some(obj => obj.isSolid && (obj.type === 'platform' || (obj.type === 'delay' && !obj.phased)) && checkRectCollision({x:player.x, y:player.y+1, width: player.width, height:player.height}, obj));
-                        if (keys.s && !player.isWallHolding && touchingGround) { 
-                            if (player.isSprinting && !player.isDashing) {
-                                player.isDashing = true;
-                                player.dashSpeed = player.maxSpeed * player.sprintMultiplier * 1.5;
-                                player.velocityX = player.dashSpeed * Math.sign(player.velocityX || 1);
-                            }
-                            if (!player.isCrouching) {
-                                player.y += player.originalHeight / 2;
-                                player.height = player.originalHeight / 2;
-                                player.isCrouching = true;
-                            }
-                        } else if (player.isCrouching && canStandUp()) { 
-                            player.y -= player.originalHeight / 2;
-                            player.height = player.originalHeight;
-                            player.isCrouching = false;
-                            player.isDashing = false;
-                        }
-                        if (player.isDashing) { 
-                            player.dashSpeed -= player.dashFriction;
-                            if (player.dashSpeed <= 0) player.isDashing = false;
-                            player.velocityX = player.dashSpeed * Math.sign(player.velocityX);
-                        }
-
-                        // --- Horizontal Collision ---
-                        player.x += player.velocityX;
-                        levelObjects.forEach(obj => {
-                            if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
-                                if (player.velocityX > 0) { player.x = obj.x - player.width; wallTouchDirection = 1; } 
-                                else if (player.velocityX < 0) { player.x = obj.x + obj.width; wallTouchDirection = -1; }
-                                player.velocityX = 0;
-                            }
-                        });
-
-                        // --- Vertical Collision ---
-                        player.y += player.velocityY;
-                        levelObjects.forEach(obj => {
-                            if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
-                                if (player.isWallHolding && player.velocityY < 0 && (player.y + player.height <= obj.y + Math.abs(player.wallClimbAcceleration * (keys.w ? -1 : 1)))) {
-                                    player.y = obj.y - player.height; onGround = true; player.isWallHolding = false;
-                                } else if (player.velocityY >= 0 && player.y - player.velocityY + player.height <= obj.y + 1) { // Mendarat
-                                    player.y = obj.y - player.height; player.velocityY = 0; onGround = true; 
-                                    player.isWallHolding = false; 
-                                    // (Reset jumps/coyote ditangani di bawah)
-                                } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) { // Bentur kepala
-                                    player.y = obj.y + obj.height; player.velocityY = 0;
+                            // ... (logika crouch & dash tidak berubah) ...
+                            const touchingGround = levelObjects.some(obj => obj.isSolid && (obj.type === 'platform' || (obj.type === 'delay' && !obj.phased)) && checkRectCollision({x:player.x, y:player.y+1, width: player.width, height:player.height}, obj));
+                            if (keys.s && !player.isWallHolding && touchingGround) { 
+                                if (player.isSprinting && !player.isDashing) {
+                                    player.isDashing = true;
+                                    player.dashSpeed = player.maxSpeed * player.sprintMultiplier * 1.5;
+                                    player.velocityX = player.dashSpeed * Math.sign(player.velocityX || 1);
                                 }
-                            }
-                        });
-                        
-                        // --- Logika Status Setelah Tumbukan ---
-                        if (onGround) {
-                            player.jumpsMade = 0;
-                            player.coyoteTimeCounter = COYOTE_TIME_FRAMES;
-                            if (jumpBufferCounter > 0) { // Lompat buffer
-                                player.velocityY = -player.jumpPower; 
-                                player.jumpsMade = 1; 
-                                jumpBufferCounter = 0;
-                                player.coyoteTimeCounter = 0;
-                            }
-                        } else {
-                            if (player.coyoteTimeCounter > 0) {
-                                player.coyoteTimeCounter--;
-                            }
-                            // Cek wall jump buffer
-                            if (jumpBufferCounter > 0 && player.isWallHolding) {
-                                player.isWallHolding = false;
-                                player.velocityY = -player.jumpPower;
-                                player.velocityX = -player.wallDirection * player.jumpPower * 0.75; 
-                                player.jumpsMade = 1;
-                                jumpBufferCounter = 0;
-                            }
-                        }
-
-
-                        // --- Interaksi Objek ---
-                        levelObjects.forEach(obj => {
-                            if (obj.isSolid && obj.type === 'spike' && checkPlayerSpikeCollision(player, obj)) { resetPlayer(); } 
-                            else if (checkRectCollision(player, obj)) {
-                                if (obj.type === 'grappler' && obj.visible && !obj.collected) {
-                                    player.hasHook = true;
-                                    obj.collected = true;
+                                if (!player.isCrouching) {
+                                    player.y += player.originalHeight / 2;
+                                    player.height = player.originalHeight / 2;
+                                    player.isCrouching = true;
                                 }
-                                // Koleksi Corndog BARU
-                                if (obj.type === 'corndog' && !obj.collected) {
-                                    obj.collected = true;
-                                    corndogCount++;
-                                    updateCorndogDisplay();
+                            } else if (player.isCrouching && canStandUp()) { 
+                                player.y -= player.originalHeight / 2;
+                                player.height = player.originalHeight;
+                                player.isCrouching = false;
+                                player.isDashing = false;
+                            }
+                            if (player.isDashing) { 
+                                player.dashSpeed -= player.dashFriction;
+                                if (player.dashSpeed <= 0) player.isDashing = false;
+                                player.velocityX = player.dashSpeed * Math.sign(player.velocityX);
+                            }
+
+                            // --- Horizontal Collision ---
+                            // ... (logika tumbukan horizontal tidak berubah) ...
+                            player.x += player.velocityX;
+                            levelObjects.forEach(obj => {
+                                if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
+                                    if (player.velocityX > 0) { player.x = obj.x - player.width; wallTouchDirection = 1; } 
+                                    else if (player.velocityX < 0) { player.x = obj.x + obj.width; wallTouchDirection = -1; }
+                                    player.velocityX = 0;
                                 }
-                                if (obj.type === 'button' && !obj.activated) {
-                                    // ... (logika tombol tidak berubah) ...
-                                    obj.activated = true;
-                                    if (obj.linkedTo) {
-                                        obj.linkedTo.forEach(targetId => {
-                                            const targetObj = levelObjects.find(t => t.id === targetId);
-                                            if(targetObj) {
-                                                if(targetObj.type === 'text_block' && targetObj.showOnTrigger) { targetObj.visible = true; }
-                                                if(targetObj.type === 'grappler') { targetObj.visible = true; }
-                                                if (targetObj.type === 'decay') {
-                                                    targetObj.phased = true;
-                                                    setTimeout(() => { targetObj.phased = false; obj.activated = false; }, 10000);
-                                                }
-                                                if (targetObj.type === 'end') {
-                                                    gameWon = true;
-                                                }
-                                                if (targetObj.type === 'music' && activeAudio[targetObj.id]) {
-                                                    Object.values(activeAudio).forEach(audio => audio.pause());
-                                                    activeAudio[targetObj.id].currentTime = 0;
-                                                    const playPromise = activeAudio[targetObj.id].play();
-                                                    if (playPromise !== undefined) {
-                                                        playPromise.catch(error => console.error("Audio play failed:", error));
-                                                    }
-                                                }
-                                                if (targetObj.type === 'laser_source') {
-                                                    levelObjects.forEach(l => { if(l.type === 'laser_source') { l.isActive = false; clearTimeout(l.activationTimeout); } });
-                                                    if (obj.laserLinkDirection) {
-                                                        targetObj.orientation = obj.laserLinkDirection;
-                                                    }
-                                                    let o = targetObj.orientation || 'left';
-                                                    if (o === 'left' || o === 'right') targetObj.position = targetObj.x;
-                                                    else targetObj.position = targetObj.y;
-                                                    targetObj.activationTimeout = setTimeout(() => { targetObj.isActive = true; }, 500);
-                                                }
-                                            }
-                                        });
+                            });
+
+                            // --- Vertical Collision ---
+                            // ... (logika tumbukan vertikal tidak berubah) ...
+                            player.y += player.velocityY;
+                            levelObjects.forEach(obj => {
+                                if (obj.isSolid && (obj.type === 'platform' || obj.type === 'spawn' || (obj.type === 'decay' && !obj.phased) || (obj.type === 'delay' && !obj.phased) || obj.type === 'end') && checkRectCollision(player, obj)) {
+                                    if (player.isWallHolding && player.velocityY < 0 && (player.y + player.height <= obj.y + Math.abs(player.wallClimbAcceleration * (keys.w ? -1 : 1)))) {
+                                        player.y = obj.y - player.height; onGround = true; player.isWallHolding = false;
+                                    } else if (player.velocityY >= 0 && player.y - player.velocityY + player.height <= obj.y + 1) { // Mendarat
+                                        player.y = obj.y - player.height; player.velocityY = 0; onGround = true; 
+                                        player.isWallHolding = false; 
+                                        // (Reset jumps/coyote ditangani di bawah)
+                                    } else if (player.velocityY < 0 && player.y - player.velocityY >= obj.y + obj.height - 1) { // Bentur kepala
+                                        player.y = obj.y + obj.height; player.velocityY = 0;
                                     }
                                 }
-                            }
-                        });
-                        
-                        // Menanam Checkpoint Corndog BARU
-                        if (keys.f && corndogCount > 0 && onGround) {
-                            corndogCount--;
-                            updateCorndogDisplay();
-                            checkpointPosition = { x: player.x, y: player.y };
-                            // Hapus bendera lama
-                            levelObjects = levelObjects.filter(obj => obj.type !== 'flag');
-                            // Tambah bendera baru
-                            levelObjects.push({ 
-                                id: Date.now(), 
-                                type: 'flag', 
-                                x: player.x, 
-                                y: player.y, 
-                                width: 40, // Sesuaikan ukuran
-                                height: 40, // Sesuaikan ukuran
-                                isSolid: false 
                             });
-                            keys.f = false; // Hindari penanaman berulang
+                            
+                            // --- Logika Status Setelah Tumbukan ---
+                            // ... (logika status tidak berubah) ...
+                            if (onGround) {
+                                player.jumpsMade = 0;
+                                // player.coyoteTimeCounter = COYOTE_TIME_FRAMES; // --- MOD --- Diganti
+                                // --- NEW: Logika Coyote Time Dinamis ---
+                                if (player.lastAction === 'walljump') {
+                                    player.coyoteTimeCounter = COYOTE_TIME_FRAMES_WALLJUMP; // 1.5 detik
+                                } else {
+                                    player.coyoteTimeCounter = COYOTE_TIME_FRAMES_NORMAL; // 1 detik
+                                }
+                                player.lastAction = 'landed'; // Reset aksi saat mendarat
+                                // --- END NEW ---
+
+                                if (jumpBufferCounter > 0) { // Lompat buffer
+                                    player.velocityY = -player.jumpPower; 
+                                    player.jumpsMade = 1; 
+                                    jumpBufferCounter = 0;
+                                    player.coyoteTimeCounter = 0;
+                                }
+                            } else {
+                                if (player.coyoteTimeCounter > 0) {
+                                    player.coyoteTimeCounter--;
+                                }
+                                // Cek wall jump buffer
+                                if (jumpBufferCounter > 0 && player.isWallHolding) {
+                                    player.isWallHolding = false;
+                                    player.velocityY = -player.jumpPower;
+                                    player.velocityX = -player.wallDirection * player.jumpPower * 0.75; 
+                                    player.jumpsMade = 1;
+                                    jumpBufferCounter = 0;
+                                }
+                            }
+
+
+                            // --- Interaksi Objek ---
+                            levelObjects.forEach(obj => {
+                                // Spike sudah ditangani oleh checkPlayerSpikeCollision
+                                if (obj.isSolid && obj.type === 'spike') {
+                                    // checkPlayerSpikeCollision dipanggil di atas
+                                } 
+                                else if (checkRectCollision(player, obj)) {
+                                    if (obj.type === 'grappler' && obj.visible && !obj.collected) {
+                                        player.hasHook = true;
+                                        obj.collected = true;
+                                    }
+                                    // Koleksi Corndog BARU
+                                    if (obj.type === 'corndog' && !obj.collected) {
+                                        obj.collected = true;
+                                        corndogCount++;
+                                        updateCorndogDisplay();
+                                    }
+                                    if (obj.type === 'button' && !obj.activated) {
+                                        // ... (logika tombol tidak berubah) ...
+                                        obj.activated = true;
+                                        if (obj.linkedTo) {
+                                            obj.linkedTo.forEach(targetId => {
+                                                const targetObj = levelObjects.find(t => t.id === targetId);
+                                                if(targetObj) {
+                                                    if(targetObj.type === 'text_block' && targetObj.showOnTrigger) { targetObj.visible = true; }
+                                                    if(targetObj.type === 'grappler') { targetObj.visible = true; }
+                                                    if (targetObj.type === 'decay') {
+                                                        targetObj.phased = true;
+                                                        setTimeout(() => { targetObj.phased = false; obj.activated = false; }, 10000);
+                                                    }
+                                                    if (targetObj.type === 'end') {
+                                                        gameWon = true;
+                                                    }
+                                                    if (targetObj.type === 'music' && activeAudio[targetObj.id]) {
+                                                        Object.values(activeAudio).forEach(audio => audio.pause());
+                                                        activeAudio[targetObj.id].currentTime = 0;
+                                                        const playPromise = activeAudio[targetObj.id].play();
+                                                        if (playPromise !== undefined) {
+                                                            playPromise.catch(error => console.error("Audio play failed:", error));
+                                                        }
+                                                    }
+                                                    if (targetObj.type === 'laser_source') {
+                                                        levelObjects.forEach(l => { if(l.type === 'laser_source') { l.isActive = false; clearTimeout(l.activationTimeout); } });
+                                                        if (obj.laserLinkDirection) {
+                                                            targetObj.orientation = obj.laserLinkDirection;
+                                                        }
+                                                        let o = targetObj.orientation || 'left';
+                                                        if (o === 'left' || o === 'right') targetObj.position = targetObj.x;
+                                                        else targetObj.position = targetObj.y;
+                                                        targetObj.activationTimeout = setTimeout(() => { targetObj.isActive = true; }, 500);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                            
+                            // Menanam Checkpoint Corndog BARU
+                            if (keys.f && corndogCount > 0 && onGround) {
+                                corndogCount--;
+                                updateCorndogDisplay();
+                                checkpointPosition = { x: player.x, y: player.y };
+                                // Hapus bendera lama
+                                levelObjects = levelObjects.filter(obj => obj.type !== 'flag');
+                                // Tambah bendera baru
+                                levelObjects.push({ 
+                                    id: Date.now(), 
+                                    type: 'flag', 
+                                    x: player.x, 
+                                    y: player.y, 
+                                    width: 40, // Sesuaikan ukuran
+                                    height: 40, // Sesuaikan ukuran
+                                    isSolid: false 
+                                });
+                                keys.f = false; // Hindari penanaman berulang
+                            }
+                            
+                            // BARU: Logika Wall Grab DIPERBARUI untuk me-reset lompatan
+                            if (!player.isWallHolding && !onGround && wallTouchDirection !== 0) {
+                                player.isWallHolding = true;
+                                player.wallDirection = wallTouchDirection;
+                                player.jumpsMade = 0; // BARU: Wall grab me-reset lompatan
+                                player.coyoteTimeCounter = 0;
+                                player.velocityY = 0;
+                            }
                         }
+                         
+                        if (player.x < 0) player.x = 0;
+                        if (player.x + player.width > worldWidth) player.x = worldWidth - player.width;
                         
-                        if (!player.isWallHolding && !onGround && wallTouchDirection !== 0) {
-                            player.isWallHolding = true;
-                            player.wallDirection = wallTouchDirection;
-                            player.jumpsMade = 1; // Wall grab dihitung sbg lompatan pertama
-                            player.coyoteTimeCounter = 0;
-                            player.velocityY = 0;
+                        if (player.y > worldHeight) {
+                            triggerPlayerDeath(); // PERUBAHAN: Panggil triggerPlayerDeath
                         }
-                    }
-                     
-                    if (player.x < 0) player.x = 0;
-                    if (player.x + player.width > worldWidth) player.x = worldWidth - player.width;
-                    
-                    if (player.y > worldHeight) {
-                        resetPlayer();
                     }
                 }
+                // State 2: Sedang Mati (Animasi)
+                else if (playerState === 'dying') {
+                    updateDeathAnimation();
+                }
+                // State 3: Mati (Menu)
+                else if (playerState === 'dead') {
+                    // Logika ditangani oleh event listener tombol
+                }
+                
             } else { // editorMode true
+                // ... (logika editor tidak berubah) ...
                 if (keys.d) camera.x += editorCameraSpeed; if (keys.a) camera.x -= editorCameraSpeed;
                 if (keys.s) camera.y += editorCameraSpeed; if (keys.w) camera.y -= editorCameraSpeed;
             }
@@ -2589,6 +2892,7 @@
                 drawEditorElements();
             } else {
                 drawChasingLaser();
+                drawShatterParticles(); // BARU: Gambar partikel di dunia game
             }
             
             if (levelSettings.hookEnabled) {
@@ -2596,17 +2900,25 @@
             }
 
             if(!gameWon) {
-                drawPlayer(player, true);
+                // drawPlayer diperbarui untuk tidak menggambar saat 'dying'
+                drawPlayer(player, true); 
             }
             
             ctx.restore();
 
+            // --- UI DI ATAS SEGALANYA (SCREEN SPACE) ---
+            
             if (!editorMode) {
                 drawActiveTextEvents();
             }
 
             if (gameWon) {
                 drawWinMessage();
+            }
+            
+            // BARU: Gambar overlay fade-to-black saat animasi kematian
+            if (playerState === 'dying') {
+                drawDeathAnimationOverlay();
             }
 
             drawTimeline();
@@ -2615,6 +2927,7 @@
 
         // Fungsi Tampilan Corndog BARU
         function updateCorndogDisplay() {
+            // ... (fungsi updateCorndogDisplay tidak berubah) ...
             corndogCountSpan.textContent = `x ${corndogCount}`;
         }
 
@@ -2653,7 +2966,7 @@
             corndogCount = 0;
             updateCorndogDisplay();
             
-            resetPlayer();
+            respawnPlayer(); // Panggil respawnPlayer
         }
         
         // ... (level tutorial tidak berubah) ...
@@ -2683,31 +2996,37 @@
         // --- Event Listeners Inisialisasi ---
         
         playBtn.addEventListener('click', () => {
+            // ... (listener playBtn tidak berubah) ...
             mainMenuButtons.style.display = 'none';
             playSubMenu.style.display = 'flex';
         });
 
         backToMainBtn.addEventListener('click', () => {
+            // ... (listener backToMainBtn tidak berubah) ...
             mainMenuButtons.style.display = 'flex';
             playSubMenu.style.display = 'none';
         });
 
         tutorialBtn.addEventListener('click', () => {
+            // ... (listener tutorialBtn tidak berubah) ...
             loadLevelData(tutorialLevel, true); // Selalu mode main
         });
         
         // Tombol Create & Play Solo BARU
         createLevelBtn.addEventListener('click', () => {
+            // ... (listener createLevelBtn tidak berubah) ...
             loadMode = 'editor';
             startGame(false); // Mulai dalam mode editor
         });
         
         playSoloBtn.addEventListener('click', () => {
+            // ... (listener playSoloBtn tidak berubah) ...
             loadMode = 'play'; // Set mode untuk load ke play
             importFileInput.click(); // Minta pengguna memilih file JSON
         });
         
         // Tombol Menu Kontrol BARU
+        // ... (listener tombol kontrol tidak berubah) ...
         controlsBtn.addEventListener('click', () => {
             mainMenu.style.display = 'none';
             controlsScreen.style.display = 'flex';
@@ -2718,6 +3037,7 @@
         });
 
         // Tombol Menu Skin BARU
+        // ... (listener tombol skin tidak berubah) ...
         customizeSkinBtn.addEventListener('click', () => {
             mainMenu.style.display = 'none';
             skinCustomizer.style.display = 'flex';
@@ -2729,6 +3049,7 @@
         });
         
         // Listener Input Username BARU
+        // ... (listener username tidak berubah) ...
         usernameInput.addEventListener('change', (e) => {
             const newUsername = e.target.value.trim();
             if (newUsername) {
@@ -2748,6 +3069,7 @@
         });
         
         // Tombol Toggle Editor BARU
+        // ... (listener tombol editor tidak berubah) ...
         inventoryToggleBtn.addEventListener('click', () => {
             const show = inventoryPanel.style.display === 'none';
             inventoryPanel.style.display = show ? 'flex' : 'none';
@@ -2760,6 +3082,7 @@
         });
 
         // --- Logika Kustomisasi Kulit BARU ---
+        // ... (logika kustomisasi kulit tidak berubah) ...
         
         function drawSkinCanvas() {
             skinCtx.fillStyle = '#777'; // Latar belakang grid
@@ -2832,6 +3155,11 @@
         });
 
         // --- Inisialisasi Akhir ---
+        
+        // LISTENER TOMBOL UI BARU
+        backToMenuInGameBtn.addEventListener('click', goToMainMenu);
+        deathRestartBtn.addEventListener('click', respawnPlayer);
+        deathMenuBtn.addEventListener('click', goToMainMenu);
 
         controlsDisplay.innerHTML = `
             <ul>
@@ -2849,9 +3177,10 @@
         addTextEventBtn.classList.add('active');
 
         saveState();
-        resetPlayer();
+        respawnPlayer(); // Panggil respawnPlayer
         
         // --- LOGIKA PRELOADER & INTRO ---
+        // ... (logika preloader tidak berubah) ...
         window.onload = () => {
             const preloader = document.getElementById('preloader');
             const introScreen = document.getElementById('intro-screen');
@@ -2900,7 +3229,7 @@
                 const savedSkin = localStorage.getItem('playerCustomSkin'); // <-- MUAT SKIN
                 if (savedSkin) {
                     playerSkinDataUrl = savedSkin;
-                    playerSkinImage.src = playerSkinDataUrl;
+                    playerSkinImage.src = savedSkin;
                 }
             } catch (e) {
                 console.error("Failed to load skin from localStorage", e);
